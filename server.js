@@ -2,6 +2,7 @@ require('dotenv').config({ debug: true });
 const express = require('express');
 const cors = require('cors');
 var admin = require('firebase-admin');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(express.json());
@@ -89,6 +90,15 @@ function getdate(e) {
     });
     return formattedDate;
 }
+
+const limiter = rateLimit({
+    windowMs: 1 * 1000,
+    max: 3,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Server can request 3 times per second, try again later!'
+});
+app.use(limiter);
 
 app.get('/', (req, res) => {
     res.send('Home')
@@ -392,6 +402,7 @@ app.post('/api/sailukhen', async (req, res) => {
                 city: recv.city,
                 parents: recv.parents,
                 contact: recv.contact,
+                birthdate:recv.birthdate,
                 level: recv.level,
                 status: 'attending',
                 time: admin.firestore.FieldValue.serverTimestamp(),
@@ -437,6 +448,7 @@ app.post('/api/maylukhen', async (req, res) => {
                 city: recv.city,
                 parents: recv.parents,
                 contact: recv.contact,
+                birthdate:recv.birthdate,
                 level: recv.level,
                 sid: recv.sid,
                 key: generatekey(recv.sid)
@@ -485,6 +497,7 @@ app.post('/api/morlukhen', async (req, res) => {
                         parents: recv.parents,
                         contact: recv.contact,
                         level: recv.level,
+                        birthdate:recv.birthdate,
                         sid: recv.sid,
                         key: generatekey(recv.sid)
                     }).then(async () => {
