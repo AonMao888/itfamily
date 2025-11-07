@@ -108,6 +108,27 @@ app.get('/key/:text', (req, res) => {
     let gen = generatekey(text);
     res.send(gen)
 })
+const checkAuthToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Authorization header is missing or malformed.' });
+    }
+
+    const idToken = authHeader.split('Bearer ')[1];
+
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+        req.user = decodedToken;
+
+        next();
+
+    } catch (error) {
+        console.error("Token verification failed:", error);
+        return res.status(401).json({ error: 'Invalid or expired authentication token.' });
+    }
+};
 
 //get all students
 app.get('/api/lukhen', async (req, res) => {
@@ -132,9 +153,12 @@ app.get('/api/lukhen', async (req, res) => {
 })
 
 //get specific student data
-app.get('/api/lukhen/:id/:key', async (req, res) => {
-    let { id, key } = req.params;
-    let got = await db.collection('students').where('sid', '==', id).get();
+app.get('/api/lukhen/:id/', checkAuthToken, async (req, res) => {
+    let { id } = req.params;
+    const uid = req.user.uid;
+    const email = req.user.email;
+    const name = req.user.name || 'N/A';
+    let got = await db.collection('students').where('accid', '==', id).get();
     if (got.empty) {
         res.json({
             status: 'fail',
