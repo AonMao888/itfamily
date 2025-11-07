@@ -152,13 +152,10 @@ app.get('/api/lukhen', async (req, res) => {
     }
 })
 
-//get specific student data
-app.get('/api/lukhen/:id/', checkAuthToken, async (req, res) => {
-    let { id } = req.params;
-    const uid = req.user.uid;
-    const email = req.user.email;
-    const name = req.user.name || 'N/A';
-    let got = await db.collection('students').where('accid', '==', id).get();
+//get specific student data with ID and Key
+app.get('/api/lukhen/1/:id/:key', async (req, res) => {
+    let { id, key } = req.params;
+    let got = await db.collection('students').where('sid', '==', id).get();
     if (got.empty) {
         res.json({
             status: 'fail',
@@ -178,6 +175,33 @@ app.get('/api/lukhen/:id/', checkAuthToken, async (req, res) => {
                 status: 'fail',
                 text: 'Invalid student key!',
                 data: []
+            })
+        }
+    }
+})
+
+//get specific student data with email and uid
+app.get('/api/lukhen/email/:email/:id', async (req, res) => {
+    let { email, id } = req.params;
+    let got = await db.collection('students').where('accid', '==', id).get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'No student found with this ID!',
+            data: []
+        })
+    } else {
+        let gotstu = got.docs[0].data();
+        if (gotstu.email === email && gotstu.accid === id) {
+            res.json({
+                status: 'success',
+                text: 'All students data got.',
+                data: gotstu
+            })
+        } else {
+            res.json({
+                status: 'fail',
+                text: 'Invalid ID or Email!',
             })
         }
     }
@@ -498,6 +522,55 @@ app.post('/api/maylukhen', async (req, res) => {
                 status: 'fail',
                 text: 'Something went wrong to update student data!',
                 data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//update student data
+app.post('/api/maylukheninfo', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        let got = await db.collection('students').doc(recv.id).get();
+        if (got.exists) {
+            let sdata = got.data();
+            if (sdata.email === recv.email && sdata.accid === recv.uid && sdata.sid === recv.sid) {
+                try {
+                    await db.collection('students').doc(recv.id).update(recv.data).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Student was updated.',
+                            data: []
+                        })
+                    }).catch(error => {
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while updating student!',
+                            data: []
+                        })
+                    })
+                } catch (e) {
+                    res.json({
+                        status: 'fail',
+                        text: 'Something went wrong to update student data!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'Invalid Email or 2 ID!'
+                })
+            }
+        } else {
+            res.json({
+                status: 'fail',
+                text: 'Student data not found!'
             })
         }
     } else {
