@@ -670,6 +670,7 @@ app.post('/api/saimawsom', async (req, res) => {
                 city: recv.city,
                 sub: recv.sub,
                 contact: recv.contact,
+                email:recv.email,
                 status: 'active',
                 role: 'teacher',
                 time: admin.firestore.FieldValue.serverTimestamp(),
@@ -714,6 +715,7 @@ app.post('/api/maymawsom', async (req, res) => {
                 address: recv.address,
                 city: recv.city,
                 contact: recv.contact,
+                email:recv.email,
                 tid: recv.tid,
                 key: generatekey(recv.tid)
             }).then(() => {
@@ -759,6 +761,7 @@ app.post('/api/mormawsom', async (req, res) => {
                         address: recv.address,
                         city: recv.city,
                         sub: recv.sub,
+                        email:recv.email,
                         contact: recv.contact,
                         tid: recv.tid,
                         key: generatekey(recv.tid)
