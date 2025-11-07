@@ -380,9 +380,9 @@ app.get('/api/totalnumbers', async (req, res) => {
                     status: 'success',
                     text: 'Data got.',
                     data: {
-                        student:stunum,
-                        activity:actnum,
-                        project:pronum
+                        student: stunum,
+                        activity: actnum,
+                        project: pronum
                     }
                 })
             }
@@ -402,11 +402,13 @@ app.post('/api/sailukhen', async (req, res) => {
                 city: recv.city,
                 parents: recv.parents,
                 contact: recv.contact,
-                birthdate:recv.birthdate,
+                birthdate: recv.birthdate,
                 level: recv.level,
                 status: 'attending',
                 time: admin.firestore.FieldValue.serverTimestamp(),
                 sid: recv.sid,
+                accid: recv.accid,
+                email: recv.email,
                 key: generatekey(recv.sid)
             }).then(() => {
                 res.json({
@@ -448,9 +450,11 @@ app.post('/api/maylukhen', async (req, res) => {
                 city: recv.city,
                 parents: recv.parents,
                 contact: recv.contact,
-                birthdate:recv.birthdate,
+                birthdate: recv.birthdate,
                 level: recv.level,
                 sid: recv.sid,
+                accid: recv.accid,
+                email: recv.email,
                 key: generatekey(recv.sid)
             }).then(() => {
                 res.json({
@@ -497,8 +501,10 @@ app.post('/api/morlukhen', async (req, res) => {
                         parents: recv.parents,
                         contact: recv.contact,
                         level: recv.level,
-                        birthdate:recv.birthdate,
+                        birthdate: recv.birthdate,
                         sid: recv.sid,
+                        accid: recv.accid,
+                        email: recv.email,
                         key: generatekey(recv.sid)
                     }).then(async () => {
                         await db.collection('students').doc(recv.docid).delete().then(() => {
@@ -911,11 +917,11 @@ app.post('/api/morreview', async (req, res) => {
             if (gotdata.uid === recv.uid && gotdata.email === recv.email) {
                 try {
                     await db.collection('deletedreviews').doc(gotdata.uid).set({
-                        email:gotdata.email,
-                        uid:gotdata.uid,
-                        text:gotdata.text,
-                        addtime:gotdata.time,
-                        deletedtime:admin.firestore.FieldValue.serverTimestamp()
+                        email: gotdata.email,
+                        uid: gotdata.uid,
+                        text: gotdata.text,
+                        addtime: gotdata.time,
+                        deletedtime: admin.firestore.FieldValue.serverTimestamp()
                     }).then(async () => {
                         await db.collection('reviews').doc(recv.docid).delete().then(() => {
                             res.json({
