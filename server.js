@@ -196,7 +196,10 @@ app.get('/api/lukhen/email/:email/:id', async (req, res) => {
             res.json({
                 status: 'success',
                 text: 'All students data got.',
-                data: gotstu
+                data: {
+                    id:got.docs[0].id,
+                    ...gotstu
+                }
             })
         } else {
             res.json({
