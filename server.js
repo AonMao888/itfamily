@@ -197,7 +197,7 @@ app.get('/api/lukhen/email/:email/:id', async (req, res) => {
                 status: 'success',
                 text: 'All students data got.',
                 data: {
-                    id:got.docs[0].id,
+                    id: got.docs[0].id,
                     ...gotstu
                 }
             })
@@ -456,6 +456,7 @@ app.post('/api/sailukhen', async (req, res) => {
                 birthdate: recv.birthdate,
                 level: recv.level,
                 status: 'attending',
+                role: 'student',
                 time: admin.firestore.FieldValue.serverTimestamp(),
                 sid: recv.sid,
                 accid: recv.accid,
@@ -670,6 +671,7 @@ app.post('/api/saimawsom', async (req, res) => {
                 sub: recv.sub,
                 contact: recv.contact,
                 status: 'active',
+                role: 'teacher',
                 time: admin.firestore.FieldValue.serverTimestamp(),
                 tid: recv.tid,
                 key: generatekey(recv.tid)
@@ -1069,6 +1071,38 @@ app.post('/api/morreview', async (req, res) => {
             status: 'fail',
             text: 'Something went wrong!',
             data: []
+        })
+    }
+})
+
+app.get('/isadmin', async (req, res) => {
+    let { email, uid } = req.query;
+    if (email && uid) {
+        let got = await db.collection('admin').where('uid', '==', uid).get();
+        if (got.empty) {
+            res.json({
+                status: 'fail',
+                text: 'Only admin can access this API!'
+            })
+        } else {
+            let da = got.docs[0].data();
+            if (da.email === email && da.uid === uid) {
+                res.json({
+                    status: 'success',
+                    text: 'You are admin.',
+                    data:da
+                })
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'Only admin can access this API!'
+                })
+            }
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Email or UID was required!'
         })
     }
 })
