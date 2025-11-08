@@ -1029,6 +1029,7 @@ app.post('/api/new/review', async (req, res) => {
                 uid: recv.uid,
                 text: recv.text,
                 rating:recv.rating,
+                name:recv.name,
                 time: admin.firestore.FieldValue.serverTimestamp(),
             }).then(() => {
                 res.json({
@@ -1073,6 +1074,7 @@ app.post('/api/morreview', async (req, res) => {
                         text: gotdata.text,
                         rating:gotdata.rating,
                         addtime: gotdata.time,
+                        name:gotdata.name,
                         deletedtime: admin.firestore.FieldValue.serverTimestamp()
                     }).then(async () => {
                         await db.collection('reviews').doc(recv.docid).delete().then(() => {
