@@ -441,6 +441,51 @@ app.get('/api/totalnumbers', async (req, res) => {
     }
 })
 
+//get recently announcement
+app.get('/api/recently/announcement', async (req, res) => {
+    let got = await db.collection('announcements').orderBy('time', 'desc').limit(2).get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        let d = got.docs.map((doc) => ({
+            id: doc.id,
+            date: getdate(doc.data().time),
+            ...doc.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Recently announcement was got.',
+            data: d
+        })
+    }
+})
+//get all announcements
+app.get('/api/announcements', async (req, res) => {
+    let got = await db.collection('announcements').get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        let d = got.docs.map((doc) => ({
+            id: doc.id,
+            date: getdate(doc.data().time),
+            ...doc.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'All announcements got.',
+            data: d
+        })
+    }
+})
+
 //add new student
 app.post('/api/sailukhen', async (req, res) => {
     let recv = req.body;
@@ -1209,6 +1254,7 @@ app.get('/isadmin', async (req, res) => {
         })
     }
 })
+
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
