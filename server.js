@@ -670,7 +670,7 @@ app.post('/api/saimawsom', async (req, res) => {
                 city: recv.city,
                 sub: recv.sub,
                 contact: recv.contact,
-                email:recv.email,
+                email: recv.email,
                 status: 'active',
                 role: 'teacher',
                 time: admin.firestore.FieldValue.serverTimestamp(),
@@ -715,7 +715,7 @@ app.post('/api/maymawsom', async (req, res) => {
                 address: recv.address,
                 city: recv.city,
                 contact: recv.contact,
-                email:recv.email,
+                email: recv.email,
                 tid: recv.tid,
                 key: generatekey(recv.tid)
             }).then(() => {
@@ -761,7 +761,7 @@ app.post('/api/mormawsom', async (req, res) => {
                         address: recv.address,
                         city: recv.city,
                         sub: recv.sub,
-                        email:recv.email,
+                        email: recv.email,
                         contact: recv.contact,
                         tid: recv.tid,
                         key: generatekey(recv.tid)
@@ -1078,6 +1078,106 @@ app.post('/api/morreview', async (req, res) => {
     }
 })
 
+//add new announcement
+app.post('/api/saianno', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('announcments').add({
+                title: recv.title,
+                msg: recv.msg,
+                uid: recv.uid,
+                email: recv.email,
+                name: recv.name,
+                time: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New announcement was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new announcement!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new announcement!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//delete announcement data
+app.post('/api/moranno', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        let got = await db.collection('announcements').doc(recv.docid).get();
+        if (got.exists) {
+            let gotdata = got.data();
+            try {
+                await db.collection('deletedannouncements').add({
+                    title: gotdata.title,
+                    msg:gotdata.msg,
+                    uid:gotdata.uid,
+                    email:gotdata.email,
+                    name:gotdata.name,
+                    addedtime:gotdata.time,
+                    deletedtime:admin.firestore.FieldValue.serverTimestamp()
+                }).then(async () => {
+                    await db.collection('announcements').doc(recv.docid).delete().then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Announcement was deleted.',
+                            data: []
+                        })
+                    }).catch((e) => {
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while deleting announcement!',
+                            data: []
+                        })
+                    })
+                }).catch(error => {
+                    res.json({
+                        status: 'fail',
+                        text: 'Something went wrong while deleting announcement!',
+                        data: []
+                    })
+                })
+            } catch (e) {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong to update announcement data!',
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 'fail',
+                text: 'No announcement found!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+
 app.get('/isadmin', async (req, res) => {
     let { email, uid } = req.query;
     if (email && uid) {
@@ -1093,7 +1193,7 @@ app.get('/isadmin', async (req, res) => {
                 res.json({
                     status: 'success',
                     text: 'You are admin.',
-                    data:da
+                    data: da
                 })
             } else {
                 res.json({
