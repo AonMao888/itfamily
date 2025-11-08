@@ -1128,7 +1128,7 @@ app.post('/api/saianno', async (req, res) => {
     let recv = req.body;
     if (recv) {
         try {
-            await db.collection('announcments').add({
+            await db.collection('announcements').add({
                 title: recv.title,
                 msg: recv.msg,
                 uid: recv.uid,
