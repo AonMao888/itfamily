@@ -142,6 +142,7 @@ app.get('/api/lukhen', async (req, res) => {
     } else {
         let d = got.docs.map((doc) => ({
             id: doc.id,
+            registerdate: getdate(doc.data().time),
             ...doc.data()
         }))
         res.json({
