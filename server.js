@@ -1260,6 +1260,46 @@ app.get('/isadmin', async (req, res) => {
     }
 })
 
+//add new form
+app.post('/api/register', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('forms').add({
+                time:admin.firestore.FieldValue.serverTimestamp(),
+                ...recv
+            }).then(async(ad) => {
+                let da = await ad.get();
+                res.json({
+                    status: 'success',
+                    text: 'New form was added.',
+                    data: {
+                        id:ad.id,
+                        ...da.data()
+                    }
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new student!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new student!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
