@@ -1307,7 +1307,11 @@ app.get('/api/get/register/:id',async(req,res)=>{
     let {id} = req.params;
     let got = await db.collection('forms').doc(id).get();
     if (got.exists) {
-        let da = got.data();
+        let da = {
+            registerdate:getdate(got.data().time),
+            id:got.id,
+            ...got.data()
+        };
         res.json({
             status:'success',
             text:'Form was found.',
