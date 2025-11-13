@@ -1275,7 +1275,8 @@ app.post('/api/register', async (req, res) => {
                     text: 'New form was added.',
                     data: {
                         id:ad.id,
-                        ...recv
+                        registeredat:getdate(da.data().time),
+                        ...da.data()
                     }
                 })
             }).catch(error => {
