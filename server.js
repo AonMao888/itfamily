@@ -1302,6 +1302,24 @@ app.post('/api/register', async (req, res) => {
         })
     }
 })
+//get specific form
+app.get('/api/get/register/:id',async(req,res)=>{
+    let {id} = req.params;
+    let got = await db.collection('forms').doc(id).get();
+    if (got.exists) {
+        let da = got.data();
+        res.json({
+            status:'success',
+            text:'Form was found.',
+            data:da
+        })
+    }else{
+        res.json({
+            status:'fail',
+            text:'No form was found with this ID.'
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
