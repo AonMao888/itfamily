@@ -1267,6 +1267,7 @@ app.post('/api/register', async (req, res) => {
         try {
             await db.collection('forms').add({
                 time:admin.firestore.FieldValue.serverTimestamp(),
+                status:'pending',
                 ...recv
             }).then(async(ad) => {
                 let da = await ad.get();
