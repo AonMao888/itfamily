@@ -93,7 +93,7 @@ function getdate(e) {
 
 const limiter = rateLimit({
     windowMs: 1 * 1000,
-    max: 3,
+    max: 5,
     standardHeaders: true,
     legacyHeaders: false,
     message: 'Server can request 3 times per second, try again later!'
@@ -1304,7 +1304,7 @@ app.post('/api/register', async (req, res) => {
 })
 //get all forms
 app.get('/api/forms', async (req, res) => {
-    let got = await db.collection('forms').get();
+    let got = await db.collection('forms').orderBy('time','desc').get();
     if (got.empty) {
         res.json({
             status: 'fail',
