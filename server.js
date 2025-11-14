@@ -1360,7 +1360,7 @@ app.get('/api/courses', async (req, res) => {
         let d = got.docs.map((doc) => ({
             id: doc.id,
             registerdate: getdate(doc.data().registertime),
-            launchdate: getdate(doc.data().launchtime),
+            launchdate: doc.data().launchtime?getdate(doc.data().launchtime):'',
             ...doc.data()
         }))
         res.json({
