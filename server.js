@@ -1349,7 +1349,7 @@ app.get('/api/get/register/:id',async(req,res)=>{
 
 //get all courses
 app.get('/api/courses', async (req, res) => {
-    let got = await db.collection('courses').orderBy('time','desc').get();
+    let got = await db.collection('courses').orderBy('registertime','desc').get();
     if (got.empty) {
         res.json({
             status: 'fail',
