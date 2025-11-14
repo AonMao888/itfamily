@@ -1302,6 +1302,28 @@ app.post('/api/register', async (req, res) => {
         })
     }
 })
+//get all forms
+app.get('/api/forms', async (req, res) => {
+    let got = await db.collection('forms').get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        let d = got.docs.map((doc) => ({
+            id: doc.id,
+            registerdate: getdate(doc.data().time),
+            ...doc.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'All forms got.',
+            data: d
+        })
+    }
+})
 //get specific form
 app.get('/api/get/register/:id',async(req,res)=>{
     let {id} = req.params;
