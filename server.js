@@ -1449,6 +1449,29 @@ app.post('/api/update/course', async (req, res) => {
         })
     }
 })
+//get specific course
+app.get('/api/get/course/:id',async(req,res)=>{
+    let {id} = req.params;
+    let got = await db.collection('courses').doc(id).get();
+    if (got.exists) {
+        let da = {
+            registerdate:getdate(got.data().registertime),
+            launchdate:got.data().launchdate?getdate(got.data().launchdate):'',
+            id:got.id,
+            ...got.data()
+        };
+        res.json({
+            status:'success',
+            text:'Form was found.',
+            data:da
+        })
+    }else{
+        res.json({
+            status:'fail',
+            text:'No form was found with this ID.'
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
