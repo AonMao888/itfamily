@@ -1411,7 +1411,7 @@ app.post('/api/new/course', async (req, res) => {
         })
     }
 })
-//add new course
+//add update course
 app.post('/api/update/course', async (req, res) => {
     let recv = req.body;
     if (recv) {
@@ -1449,7 +1449,7 @@ app.post('/api/update/course', async (req, res) => {
         })
     }
 })
-//add new course
+//add edit course
 app.post('/api/edit/course', async (req, res) => {
     let recv = req.body;
     if (recv) {
@@ -1506,6 +1506,93 @@ app.get('/api/get/course/:id',async(req,res)=>{
         res.json({
             status:'fail',
             text:'No form was found with this ID.'
+        })
+    }
+})
+
+//get all posts for admin
+app.get('/api/admin/posts/', async (req, res) => {
+    let {id} = req.params;
+    let got = await db.collection('courses').orderBy('time','desc').get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        let d = got.docs.map((doc) => ({
+            id: doc.id,
+            date: getdate(doc.data().time),
+            ...doc.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'All posts was got.',
+            data: d
+        })
+    }
+})
+//get all posts
+app.get('/api/posts/:id', async (req, res) => {
+    let {id} = req.params;
+    let got = await db.collection('courses').where('courseid','==',id).orderBy('time','desc').get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        let d = got.docs.map((doc) => ({
+            id: doc.id,
+            date: getdate(doc.data().time),
+            ...doc.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'All posts was got.',
+            data: d
+        })
+    }
+})
+//add new post
+app.post('/api/new/post', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('posts').add({
+                time:admin.firestore.FieldValue.serverTimestamp(),
+                text:recv.text,
+                coursetitle:recv.coursetitle,
+                courseid:recv.courseid,
+                writername:recv.writername,
+                writeremail:recv.writeremail,
+                writeruid:recv.writeruid,
+            }).then(async(ad) => {
+                res.json({
+                    status: 'success',
+                    text: 'New post was added.',
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new post!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new post!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
         })
     }
 })
