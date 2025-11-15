@@ -1380,6 +1380,7 @@ app.post('/api/new/course', async (req, res) => {
                 launchtime:'',
                 status:'inactive',
                 title:recv.title,
+                type:recv.type,
                 ownername:recv.ownername,
                 owneremail:recv.owneremail,
                 owneruid:recv.owneruid,
@@ -1420,6 +1421,7 @@ app.post('/api/update/course', async (req, res) => {
                 ownername:recv.ownername,
                 owneremail:recv.owneremail,
                 owneruid:recv.owneruid,
+                type:recv.type
             }).then(async(ad) => {
                 res.json({
                     status: 'success',
