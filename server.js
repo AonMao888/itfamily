@@ -1449,6 +1449,43 @@ app.post('/api/update/course', async (req, res) => {
         })
     }
 })
+//add new course
+app.post('/api/edit/course', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('courses').doc(recv.id).update({
+                title:recv.title,
+                des:recv.des,
+                what:recv.what,
+                type:recv.type,
+            }).then(async(ad) => {
+                res.json({
+                    status: 'success',
+                    text: 'Course was updated.',
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while updating course!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update course!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
 //get specific course
 app.get('/api/get/course/:id',async(req,res)=>{
     let {id} = req.params;
