@@ -1060,7 +1060,7 @@ app.post('/api/new/review', async (req, res) => {
         })
     }
 })
-//delete teacher data
+//delete review
 app.post('/api/morreview', async (req, res) => {
     let recv = req.body;
     if (recv) {
@@ -1513,7 +1513,7 @@ app.get('/api/get/course/:id',async(req,res)=>{
 //get all posts for admin
 app.get('/api/admin/posts/', async (req, res) => {
     let {id} = req.params;
-    let got = await db.collection('courses').orderBy('time','desc').get();
+    let got = await db.collection('posts').orderBy('time','desc').get();
     if (got.empty) {
         res.json({
             status: 'fail',
@@ -1536,7 +1536,7 @@ app.get('/api/admin/posts/', async (req, res) => {
 //get all posts
 app.get('/api/posts/:id', async (req, res) => {
     let {id} = req.params;
-    let got = await db.collection('courses').where('courseid','==',id).orderBy('time','desc').get();
+    let got = await db.collection('posts').where('courseid','==',id).orderBy('time','desc').get();
     if (got.empty) {
         res.json({
             status: 'fail',
@@ -1593,6 +1593,72 @@ app.post('/api/new/post', async (req, res) => {
             status: 'fail',
             text: 'Something went wrong!',
             data: []
+        })
+    }
+})
+
+//add new review
+app.post('/api/new/course/review', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('coursereviews').add({
+                email: recv.email,
+                uid: recv.uid,
+                text: recv.text,
+                rating:recv.rating,
+                name:recv.name,
+                courseid:recv.courseid,
+                coursename:recv.coursename,
+                courseowneruid:recv.courseowneruid,
+                time: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New review was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new review!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new review!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//get specific course
+app.get('/api/get/course/reviews/:id',async(req,res)=>{
+    let {id} = req.params;
+    let got = await db.collection('coursereviews').doc(id).get();
+    if (got.exists) {
+        let da = {
+            date:getdate(got.data().time),
+            id:got.id,
+            ...got.data()
+        };
+        res.json({
+            status:'success',
+            text:'Reviews were found.',
+            data:da
+        })
+    }else{
+        res.json({
+            status:'fail',
+            text:'No review was found with this ID.'
         })
     }
 })
