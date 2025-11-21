@@ -1643,8 +1643,8 @@ app.post('/api/new/course/review', async (req, res) => {
 //get specific course
 app.get('/api/get/course/reviews/:id',async(req,res)=>{
     let {id} = req.params;
-    let got = await db.collection('coursereviews').doc(id).get();
-    if (got.exists) {
+    let got = await db.collection('coursereviews').where('courseid','==',id).get();
+    if (!got.empty) {
         let da = {
             date:getdate(got.data().time),
             id:got.id,
