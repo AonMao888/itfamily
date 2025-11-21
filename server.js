@@ -1602,7 +1602,8 @@ app.post('/api/new/course/review', async (req, res) => {
     let recv = req.body;
     if (recv) {
         try {
-            await db.collection('coursereviews').add({
+            let fullid = recv.courseid+recv.uid;
+            await db.collection('coursereviews').doc(fullid).set({
                 email: recv.email,
                 uid: recv.uid,
                 text: recv.text,
