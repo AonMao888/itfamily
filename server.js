@@ -1645,15 +1645,15 @@ app.get('/api/get/course/reviews/:id',async(req,res)=>{
     let {id} = req.params;
     let got = await db.collection('coursereviews').where('courseid','==',id).get();
     if (!got.empty) {
-        let da = {
-            date:getdate(got.data().time),
-            id:got.id,
-            ...got.data()
-        };
+        let all = got.docs.map((d)=>({
+            date:getdate(d.data().time),
+            id:d.id,
+            ...d.data()
+        }))
         res.json({
             status:'success',
             text:'Reviews were found.',
-            data:da
+            data:all
         })
     }else{
         res.json({
