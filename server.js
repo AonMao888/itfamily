@@ -1535,27 +1535,62 @@ app.get('/api/admin/posts/', async (req, res) => {
 })
 //get all posts
 app.get('/api/posts/:id', async (req, res) => {
-    let {id} = req.params;
-    let got = await db.collection('posts').where('courseid','==',id).orderBy('time','desc').get();
-    if (got.empty) {
-        res.json({
-            status: 'fail',
-            text: 'Something went wrong!',
-            data: []
-        })
-    } else {
-        let d = got.docs.map((doc) => ({
+    try {
+        const { id } = req.params;
+
+        // 1. Run the query
+        const snapshot = await db.collection('posts')
+            .where('courseid', '==', id)
+            .get();
+
+        // 2. Handle "No Data" naturally (Not an error)
+        if (snapshot.empty) {
+            return res.json({
+                status: 'success',
+                text: 'No posts found for this course.', // Informative text
+                data: [] // Return empty array so frontend doesn't break
+            });
+        }
+
+        let posts = snapshot.docs.map(doc => ({
             id: doc.id,
-            date: getdate(doc.data().time),
             ...doc.data()
-        }))
+        }));
+
+        // 3. SORT MANUALLY HERE
+        // This sorts the array by the 'time' field (Descending = Newest First)
+        posts.sort((a, b) => {
+            // Handle Firestore Timestamp objects (which have .seconds)
+            if (a.time && b.time && a.time.seconds) {
+                return b.time.seconds - a.time.seconds;
+            }
+            // Handle standard date strings/numbers
+            return new Date(b.time) - new Date(a.time);
+        });
+
+        // 4. Format the date for the frontend AFTER sorting
+        const finalData = posts.map(p => ({
+            ...p,
+            date: getdate(p.time) // Formatting function
+        }));
+
+        // 4. Return success
         res.json({
             status: 'success',
-            text: 'All posts was got.',
-            data: d
-        })
+            text: 'All posts retrieved.',
+            data: finalData
+        });
+
+    } catch (error) {
+        // 5. Handle actual errors (Index missing, DB offline, etc.)
+        console.error("Error fetching posts:", error);
+        res.status(500).json({
+            status: 'error',
+            text: error.message, // Often helpful during dev, hide in production
+            data: []
+        });
     }
-})
+});
 //add new post
 app.post('/api/new/post', async (req, res) => {
     let recv = req.body;
