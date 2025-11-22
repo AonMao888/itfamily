@@ -1647,6 +1647,8 @@ app.post('/api/delete/post', async (req, res) => {
                         writername: gotdata.writername,
                         writeremail: gotdata.writeremail,
                         writeruid: gotdata.writeruid,
+                        requesteruid:recv.requesteruid,
+                        requesteremail:recv.requesteremail,
                         deletedtime: admin.firestore.FieldValue.serverTimestamp()
                     }).then(async () => {
                         await db.collection('posts').doc(recv.docid).delete().then(() => {
