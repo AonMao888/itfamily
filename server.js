@@ -1029,8 +1029,8 @@ app.post('/api/new/review', async (req, res) => {
                 email: recv.email,
                 uid: recv.uid,
                 text: recv.text,
-                rating:recv.rating,
-                name:recv.name,
+                rating: recv.rating,
+                name: recv.name,
                 time: admin.firestore.FieldValue.serverTimestamp(),
             }).then(() => {
                 res.json({
@@ -1073,9 +1073,9 @@ app.post('/api/morreview', async (req, res) => {
                         email: gotdata.email,
                         uid: gotdata.uid,
                         text: gotdata.text,
-                        rating:gotdata.rating,
+                        rating: gotdata.rating,
                         addtime: gotdata.time,
-                        name:gotdata.name,
+                        name: gotdata.name,
                         deletedtime: admin.firestore.FieldValue.serverTimestamp()
                     }).then(async () => {
                         await db.collection('reviews').doc(recv.docid).delete().then(() => {
@@ -1178,12 +1178,12 @@ app.post('/api/moranno', async (req, res) => {
             try {
                 await db.collection('deletedannouncements').add({
                     title: gotdata.title,
-                    msg:gotdata.msg,
-                    uid:gotdata.uid,
-                    email:gotdata.email,
-                    name:gotdata.name,
-                    addedtime:gotdata.time,
-                    deletedtime:admin.firestore.FieldValue.serverTimestamp()
+                    msg: gotdata.msg,
+                    uid: gotdata.uid,
+                    email: gotdata.email,
+                    name: gotdata.name,
+                    addedtime: gotdata.time,
+                    deletedtime: admin.firestore.FieldValue.serverTimestamp()
                 }).then(async () => {
                     await db.collection('announcements').doc(recv.docid).delete().then(() => {
                         res.json({
@@ -1266,17 +1266,17 @@ app.post('/api/register', async (req, res) => {
     if (recv) {
         try {
             await db.collection('forms').add({
-                time:admin.firestore.FieldValue.serverTimestamp(),
-                status:'pending',
+                time: admin.firestore.FieldValue.serverTimestamp(),
+                status: 'pending',
                 ...recv
-            }).then(async(ad) => {
+            }).then(async (ad) => {
                 let da = await ad.get();
                 res.json({
                     status: 'success',
                     text: 'New form was added.',
                     data: {
-                        id:ad.id,
-                        registeredat:getdate(da.data().time),
+                        id: ad.id,
+                        registeredat: getdate(da.data().time),
                         ...da.data()
                     }
                 })
@@ -1304,7 +1304,7 @@ app.post('/api/register', async (req, res) => {
 })
 //get all forms
 app.get('/api/forms', async (req, res) => {
-    let got = await db.collection('forms').orderBy('time','desc').get();
+    let got = await db.collection('forms').orderBy('time', 'desc').get();
     if (got.empty) {
         res.json({
             status: 'fail',
@@ -1325,31 +1325,31 @@ app.get('/api/forms', async (req, res) => {
     }
 })
 //get specific form
-app.get('/api/get/register/:id',async(req,res)=>{
-    let {id} = req.params;
+app.get('/api/get/register/:id', async (req, res) => {
+    let { id } = req.params;
     let got = await db.collection('forms').doc(id).get();
     if (got.exists) {
         let da = {
-            registerdate:getdate(got.data().time),
-            id:got.id,
+            registerdate: getdate(got.data().time),
+            id: got.id,
             ...got.data()
         };
         res.json({
-            status:'success',
-            text:'Form was found.',
-            data:da
+            status: 'success',
+            text: 'Form was found.',
+            data: da
         })
-    }else{
+    } else {
         res.json({
-            status:'fail',
-            text:'No form was found with this ID.'
+            status: 'fail',
+            text: 'No form was found with this ID.'
         })
     }
 })
 
 //get all courses
 app.get('/api/courses', async (req, res) => {
-    let got = await db.collection('courses').orderBy('registertime','desc').get();
+    let got = await db.collection('courses').orderBy('registertime', 'desc').get();
     if (got.empty) {
         res.json({
             status: 'fail',
@@ -1360,7 +1360,7 @@ app.get('/api/courses', async (req, res) => {
         let d = got.docs.map((doc) => ({
             id: doc.id,
             registerdate: getdate(doc.data().registertime),
-            launchdate: doc.data().launchtime?getdate(doc.data().launchtime):'',
+            launchdate: doc.data().launchtime ? getdate(doc.data().launchtime) : '',
             ...doc.data()
         }))
         res.json({
@@ -1376,15 +1376,15 @@ app.post('/api/new/course', async (req, res) => {
     if (recv) {
         try {
             await db.collection('courses').add({
-                registertime:admin.firestore.FieldValue.serverTimestamp(),
-                launchtime:'',
-                status:'inactive',
-                title:recv.title,
-                type:recv.type,
-                ownername:recv.ownername,
-                owneremail:recv.owneremail,
-                owneruid:recv.owneruid,
-            }).then(async(ad) => {
+                registertime: admin.firestore.FieldValue.serverTimestamp(),
+                launchtime: '',
+                status: 'inactive',
+                title: recv.title,
+                type: recv.type,
+                ownername: recv.ownername,
+                owneremail: recv.owneremail,
+                owneruid: recv.owneruid,
+            }).then(async (ad) => {
                 res.json({
                     status: 'success',
                     text: 'New course was added.',
@@ -1417,12 +1417,12 @@ app.post('/api/update/course', async (req, res) => {
     if (recv) {
         try {
             await db.collection('courses').doc(recv.id).update({
-                title:recv.title,
-                ownername:recv.ownername,
-                owneremail:recv.owneremail,
-                owneruid:recv.owneruid,
-                type:recv.type
-            }).then(async(ad) => {
+                title: recv.title,
+                ownername: recv.ownername,
+                owneremail: recv.owneremail,
+                owneruid: recv.owneruid,
+                type: recv.type
+            }).then(async (ad) => {
                 res.json({
                     status: 'success',
                     text: 'Course was updated.',
@@ -1455,11 +1455,11 @@ app.post('/api/edit/course', async (req, res) => {
     if (recv) {
         try {
             await db.collection('courses').doc(recv.id).update({
-                title:recv.title,
-                des:recv.des,
-                what:recv.what,
-                type:recv.type,
-            }).then(async(ad) => {
+                title: recv.title,
+                des: recv.des,
+                what: recv.what,
+                type: recv.type,
+            }).then(async (ad) => {
                 res.json({
                     status: 'success',
                     text: 'Course was updated.',
@@ -1487,33 +1487,33 @@ app.post('/api/edit/course', async (req, res) => {
     }
 })
 //get specific course
-app.get('/api/get/course/:id',async(req,res)=>{
-    let {id} = req.params;
+app.get('/api/get/course/:id', async (req, res) => {
+    let { id } = req.params;
     let got = await db.collection('courses').doc(id).get();
     if (got.exists) {
         let da = {
-            registerdate:getdate(got.data().registertime),
-            launchdate:got.data().launchdate?getdate(got.data().launchdate):'',
-            id:got.id,
+            registerdate: getdate(got.data().registertime),
+            launchdate: got.data().launchdate ? getdate(got.data().launchdate) : '',
+            id: got.id,
             ...got.data()
         };
         res.json({
-            status:'success',
-            text:'Form was found.',
-            data:da
+            status: 'success',
+            text: 'Form was found.',
+            data: da
         })
-    }else{
+    } else {
         res.json({
-            status:'fail',
-            text:'No form was found with this ID.'
+            status: 'fail',
+            text: 'No form was found with this ID.'
         })
     }
 })
 
 //get all posts for admin
 app.get('/api/admin/posts/', async (req, res) => {
-    let {id} = req.params;
-    let got = await db.collection('posts').orderBy('time','desc').get();
+    let { id } = req.params;
+    let got = await db.collection('posts').orderBy('time', 'desc').get();
     if (got.empty) {
         res.json({
             status: 'fail',
@@ -1597,14 +1597,14 @@ app.post('/api/new/post', async (req, res) => {
     if (recv) {
         try {
             await db.collection('posts').add({
-                time:admin.firestore.FieldValue.serverTimestamp(),
-                text:recv.text,
-                coursetitle:recv.coursetitle,
-                courseid:recv.courseid,
-                writername:recv.writername,
-                writeremail:recv.writeremail,
-                writeruid:recv.writeruid,
-            }).then(async(ad) => {
+                time: admin.firestore.FieldValue.serverTimestamp(),
+                text: recv.text,
+                coursetitle: recv.coursetitle,
+                courseid: recv.courseid,
+                writername: recv.writername,
+                writeremail: recv.writeremail,
+                writeruid: recv.writeruid,
+            }).then(async (ad) => {
                 res.json({
                     status: 'success',
                     text: 'New post was added.',
@@ -1631,22 +1631,89 @@ app.post('/api/new/post', async (req, res) => {
         })
     }
 })
+//delete course post
+app.post('/api/delete/post', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        let got = await db.collection('posts').doc(recv.docid).get();
+        if (got.exists) {
+            let gotdata = got.data();
+            if (gotdata.writeruid === recv.requesteruid && gotdata.writeremail === recv.requesteremail) {
+                try {
+                    await db.collection('deletedposts').add({
+                        text: gotdata.text,
+                        coursetitle: gotdata.coursetitle,
+                        courseid: gotdata.courseid,
+                        writername: gotdata.writername,
+                        writeremail: gotdata.writeremail,
+                        writeruid: gotdata.writeruid,
+                        deletedtime: admin.firestore.FieldValue.serverTimestamp()
+                    }).then(async () => {
+                        await db.collection('posts').doc(recv.docid).delete().then(() => {
+                            res.json({
+                                status: 'success',
+                                text: 'Post was deleted.',
+                                data: []
+                            })
+                        }).catch((e) => {
+                            res.json({
+                                status: 'fail',
+                                text: 'Something went wrong while deleting post!',
+                                data: []
+                            })
+                        })
+                    }).catch(error => {
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while deleting post!',
+                            data: []
+                        })
+                    })
+                } catch (e) {
+                    res.json({
+                        status: 'fail',
+                        text: 'Something went wrong to update post data!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'Permission required to request!',
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 'fail',
+                text: 'No post found!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
 
 //add new review
 app.post('/api/new/course/review', async (req, res) => {
     let recv = req.body;
     if (recv) {
         try {
-            let fullid = recv.courseid+recv.uid;
+            let fullid = recv.courseid + recv.uid;
             await db.collection('coursereviews').doc(fullid).set({
                 email: recv.email,
                 uid: recv.uid,
                 text: recv.text,
-                rating:recv.rating,
-                name:recv.name,
-                courseid:recv.courseid,
-                coursename:recv.coursename,
-                courseowneruid:recv.courseowneruid,
+                rating: recv.rating,
+                name: recv.name,
+                courseid: recv.courseid,
+                coursename: recv.coursename,
+                courseowneruid: recv.courseowneruid,
                 time: admin.firestore.FieldValue.serverTimestamp(),
             }).then(() => {
                 res.json({
@@ -1677,24 +1744,24 @@ app.post('/api/new/course/review', async (req, res) => {
     }
 })
 //get specific course
-app.get('/api/get/course/reviews/:id',async(req,res)=>{
-    let {id} = req.params;
-    let got = await db.collection('coursereviews').where('courseid','==',id).get();
+app.get('/api/get/course/reviews/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('coursereviews').where('courseid', '==', id).get();
     if (!got.empty) {
-        let all = got.docs.map((d)=>({
-            date:getdate(d.data().time),
-            id:d.id,
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
             ...d.data()
         }))
         res.json({
-            status:'success',
-            text:'Reviews were found.',
-            data:all
+            status: 'success',
+            text: 'Reviews were found.',
+            data: all
         })
-    }else{
+    } else {
         res.json({
-            status:'fail',
-            text:'No review was found with this ID.'
+            status: 'fail',
+            text: 'No review was found with this ID.'
         })
     }
 })
