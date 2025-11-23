@@ -1647,8 +1647,8 @@ app.post('/api/delete/post', async (req, res) => {
                         writername: gotdata.writername,
                         writeremail: gotdata.writeremail,
                         writeruid: gotdata.writeruid,
-                        requesteruid:recv.requesteruid,
-                        requesteremail:recv.requesteremail,
+                        requesteruid: recv.requesteruid,
+                        requesteremail: recv.requesteremail,
                         deletedtime: admin.firestore.FieldValue.serverTimestamp()
                     }).then(async () => {
                         await db.collection('posts').doc(recv.docid).delete().then(() => {
@@ -1767,19 +1767,20 @@ app.get('/api/get/course/reviews/:id', async (req, res) => {
         })
     }
 })
-//add new course student
-app.post('/api/new/course/student', async (req, res) => {
+//add new course student request
+app.post('/api/new/course/request', async (req, res) => {
     let recv = req.body;
     if (recv) {
         try {
-            await db.collection('coursestudents').add({
-                name: recv.name,
+            await db.collection('requestcourse').add({
+                requestername: recv.requestername,
                 time: admin.firestore.FieldValue.serverTimestamp(),
-                uid: recv.uid,
-                email: recv.email,
-                courseid:recv.courseid,
-                accepteruid:recv.accepteruid,
-                accepteremail:recv.accepteremail
+                courseid: recv.courseid,
+                courseowneremail: recv.courseowneremail,
+                courseowneruid: recv.courseowneruid,
+                requesteruid: recv.accepteruid,
+                requesteremail: recv.accepteremail,
+                status: "requested"
             }).then(() => {
                 res.json({
                     status: 'success',
@@ -1809,6 +1810,28 @@ app.post('/api/new/course/student', async (req, res) => {
     }
 })
 //get specific course students
+app.get('/api/get/course/requests/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('requestcourse').where('courseid', '==', id).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Requests were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No request was found with this ID.'
+        })
+    }
+})
+//get specific course students
 app.get('/api/get/course/students/:id', async (req, res) => {
     let { id } = req.params;
     let got = await db.collection('coursestudents').where('courseid', '==', id).get();
@@ -1827,6 +1850,72 @@ app.get('/api/get/course/students/:id', async (req, res) => {
         res.json({
             status: 'fail',
             text: 'No student was found with this ID.'
+        })
+    }
+})
+//add accept student request
+app.post('/api/accept/course/request', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            let got = await db.collection('requestcourse').doc(recv.id).get();
+            if (got.exists) {
+                let gotdata = got.data();
+                if (gotdata.courseowneremail === recv.accepteremail && gotdata.owneruid === recv.accepteruid) {
+                    await db.collection('coursestudents').add({
+                        studentname: gotdata.requestername,
+                        time: admin.firestore.FieldValue.serverTimestamp(),
+                        courseid: gotdata.courseid,
+                        studentuid: gotdata.requesteruid,
+                        studentemail: gotdata.requesteremail,
+                        requestdate: gotdata.time,
+                        accepteremail: recv.accepteremail,
+                        accepteruid: recv.accepteremail,
+                        courseowneremail: gotdata.courseowneremail,
+                        courseowneruid: recv.courseowneremail
+                    }).then(async () => {
+                        await db.collection('requestcourse').doc(got.id).update({
+                            status: 'accepted'
+                        }).then(() => {
+                            res.json({
+                                status: 'success',
+                                text: 'New student was accepted.',
+                                data: []
+                            })
+                        })
+                    }).catch(error => {
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while accepting new student!',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'No permission to reqest!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No request found with thid ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new student!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
         })
     }
 })
