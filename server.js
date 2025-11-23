@@ -1745,7 +1745,7 @@ app.post('/api/new/course/review', async (req, res) => {
         })
     }
 })
-//get specific course
+//get specific course reviews
 app.get('/api/get/course/reviews/:id', async (req, res) => {
     let { id } = req.params;
     let got = await db.collection('coursereviews').where('courseid', '==', id).get();
@@ -1764,6 +1764,69 @@ app.get('/api/get/course/reviews/:id', async (req, res) => {
         res.json({
             status: 'fail',
             text: 'No review was found with this ID.'
+        })
+    }
+})
+//add new course student
+app.post('/api/new/course/student', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('coursestudents').add({
+                name: recv.name,
+                time: admin.firestore.FieldValue.serverTimestamp(),
+                uid: recv.uid,
+                email: recv.email,
+                courseid:recv.courseid,
+                accepteruid:recv.accepteruid,
+                accepteremail:recv.accepteremail
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New student was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new student!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new student!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//get specific course students
+app.get('/api/get/course/students/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('coursestudents').where('courseid', '==', id).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Students were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No student was found with this ID.'
         })
     }
 })
