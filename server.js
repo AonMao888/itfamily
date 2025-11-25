@@ -1458,6 +1458,7 @@ app.post('/api/edit/course', async (req, res) => {
                 title: recv.title,
                 des: recv.des,
                 what: recv.what,
+                price:recv.price,
                 type: recv.type,
             }).then(async (ad) => {
                 res.json({
