@@ -1771,6 +1771,8 @@ app.get('/api/get/course/reviews/:id', async (req, res) => {
 //add new course student request
 app.post('/api/new/course/request', async (req, res) => {
     let recv = req.body;
+    console.log(recv);
+    
     if (recv) {
         try {
             await db.collection('requestcourse').add({
@@ -1779,26 +1781,28 @@ app.post('/api/new/course/request', async (req, res) => {
                 courseid: recv.courseid,
                 courseowneremail: recv.courseowneremail,
                 courseowneruid: recv.courseowneruid,
-                requesteruid: recv.accepteruid,
-                requesteremail: recv.accepteremail,
+                requesteruid: recv.requesteruid,
+                requesteremail: recv.requesteruid,
+                accepteremail:'',
+                accepteruid:'',
                 status: "requested"
             }).then(() => {
                 res.json({
                     status: 'success',
-                    text: 'New student was added.',
+                    text: 'Your request was successfully added.',
                     data: []
                 })
             }).catch(error => {
                 res.json({
                     status: 'fail',
-                    text: 'Something went wrong while adding new student!',
+                    text: 'Something went wrong while requesting to course!',
                     data: []
                 })
             })
         } catch (e) {
             res.json({
                 status: 'fail',
-                text: 'Something went wrong to add new student!',
+                text: 'Something went wrong to request course!',
                 data: []
             })
         }
@@ -1917,6 +1921,28 @@ app.post('/api/accept/course/request', async (req, res) => {
             status: 'fail',
             text: 'Something went wrong!',
             data: []
+        })
+    }
+})
+//get specific course requests
+app.get('/api/get/course/requests/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('requestcourse').where('courseid', '==', id).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Requests were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No request was found with this ID.'
         })
     }
 })
