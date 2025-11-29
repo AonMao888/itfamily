@@ -1866,7 +1866,7 @@ app.post('/api/accept/course/request', async (req, res) => {
             let got = await db.collection('requestcourse').doc(recv.id).get();
             if (got.exists) {
                 let gotdata = got.data();
-                if (gotdata.courseowneremail === recv.accepteremail && gotdata.owneruid === recv.accepteruid) {
+                if (gotdata.courseowneremail === recv.accepteremail && gotdata.courseowneruid === recv.accepteruid) {
                     await db.collection('coursestudents').add({
                         studentname: gotdata.requestername,
                         time: admin.firestore.FieldValue.serverTimestamp(),
@@ -1927,12 +1927,14 @@ app.post('/api/accept/course/request', async (req, res) => {
 //add accept student request
 app.post('/api/decline/course/request', async (req, res) => {
     let recv = req.body;
+    console.log(recv);
+    
     if (recv) {
         try {
             let got = await db.collection('requestcourse').doc(recv.id).get();
             if (got.exists) {
                 let gotdata = got.data();
-                if (gotdata.courseowneremail === recv.accepteremail && gotdata.owneruid === recv.accepteruid) {
+                if (gotdata.courseowneremail === recv.accepteremail && gotdata.courseowneruid === recv.accepteruid) {
                     await db.collection('requestcourse').doc(got.id).update({
                         status: 'rejected'
                     }).then(() => {
