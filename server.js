@@ -1842,7 +1842,7 @@ app.get('/api/get/course/students/:id', async (req, res) => {
     let got = await db.collection('coursestudents').where('courseid', '==', id).get();
     if (!got.empty) {
         let all = got.docs.map((d) => ({
-            requesteddata: getdate(d.data().requestdate),
+            requesteddate: getdate(d.data().requestdate),
             acceptdate: getdate(d.data().time),
             id: d.id,
             ...d.data()
