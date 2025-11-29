@@ -1782,7 +1782,7 @@ app.post('/api/new/course/request', async (req, res) => {
                 courseowneremail: recv.courseowneremail,
                 courseowneruid: recv.courseowneruid,
                 requesteruid: recv.requesteruid,
-                requesteremail: recv.requesteruid,
+                requesteremail: recv.requesteremail,
                 accepteremail:'',
                 accepteruid:'',
                 status: "requested"
