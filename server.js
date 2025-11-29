@@ -1458,7 +1458,7 @@ app.post('/api/edit/course', async (req, res) => {
                 title: recv.title,
                 des: recv.des,
                 what: recv.what,
-                price:recv.price,
+                price: recv.price,
                 type: recv.type,
             }).then(async (ad) => {
                 res.json({
@@ -1772,7 +1772,7 @@ app.get('/api/get/course/reviews/:id', async (req, res) => {
 app.post('/api/new/course/request', async (req, res) => {
     let recv = req.body;
     console.log(recv);
-    
+
     if (recv) {
         try {
             await db.collection('requestcourse').add({
@@ -1783,8 +1783,8 @@ app.post('/api/new/course/request', async (req, res) => {
                 courseowneruid: recv.courseowneruid,
                 requesteruid: recv.requesteruid,
                 requesteremail: recv.requesteremail,
-                accepteremail:'',
-                accepteruid:'',
+                accepteremail: '',
+                accepteruid: '',
                 status: "requested"
             }).then(() => {
                 res.json({
@@ -1913,6 +1913,53 @@ app.post('/api/accept/course/request', async (req, res) => {
             res.json({
                 status: 'fail',
                 text: 'Something went wrong to add new student!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//add accept student request
+app.post('/api/decline/course/request', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            let got = await db.collection('requestcourse').doc(recv.id).get();
+            if (got.exists) {
+                let gotdata = got.data();
+                if (gotdata.courseowneremail === recv.accepteremail && gotdata.owneruid === recv.accepteruid) {
+                    await db.collection('requestcourse').doc(got.id).update({
+                        status: 'rejected'
+                    }).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Requestation was rejected.',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'No permission to reqest!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No request found with thid ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to decline request!',
                 data: []
             })
         }
