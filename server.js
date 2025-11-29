@@ -1867,7 +1867,8 @@ app.post('/api/accept/course/request', async (req, res) => {
             if (got.exists) {
                 let gotdata = got.data();
                 if (gotdata.courseowneremail === recv.accepteremail && gotdata.courseowneruid === recv.accepteruid) {
-                    await db.collection('coursestudents').add({
+                    let did = got.id+gotdata.requesteruid;
+                    await db.collection('coursestudents').doc(did).set({
                         studentname: gotdata.requestername,
                         time: admin.firestore.FieldValue.serverTimestamp(),
                         courseid: gotdata.courseid,
