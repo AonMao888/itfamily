@@ -1842,7 +1842,8 @@ app.get('/api/get/course/students/:id', async (req, res) => {
     let got = await db.collection('coursestudents').where('courseid', '==', id).get();
     if (!got.empty) {
         let all = got.docs.map((d) => ({
-            date: getdate(d.data().time),
+            requestdate: getdate(d.data().requestdate),
+            acceptdate: getdate(d.data().time),
             id: d.id,
             ...d.data()
         }))
@@ -1867,7 +1868,7 @@ app.post('/api/accept/course/request', async (req, res) => {
             if (got.exists) {
                 let gotdata = got.data();
                 if (gotdata.courseowneremail === recv.accepteremail && gotdata.courseowneruid === recv.accepteruid) {
-                    let did = got.id+gotdata.requesteruid;
+                    let did = got.id + gotdata.requesteruid;
                     await db.collection('coursestudents').doc(did).set({
                         studentname: gotdata.requestername,
                         time: admin.firestore.FieldValue.serverTimestamp(),
@@ -1876,12 +1877,14 @@ app.post('/api/accept/course/request', async (req, res) => {
                         studentemail: gotdata.requesteremail,
                         requestdate: gotdata.time,
                         accepteremail: recv.accepteremail,
-                        accepteruid: recv.accepteremail,
+                        accepteruid: recv.accepteruid,
                         courseowneremail: gotdata.courseowneremail,
-                        courseowneruid: recv.courseowneremail
+                        courseowneruid: gotdata.courseowneruid
                     }).then(async () => {
                         await db.collection('requestcourse').doc(got.id).update({
-                            status: 'accepted'
+                            status: 'accepted',
+                            accepteremail: recv.accepteremail,
+                            accepteruid: recv.accepteruid,
                         }).then(() => {
                             res.json({
                                 status: 'success',
@@ -1911,9 +1914,11 @@ app.post('/api/accept/course/request', async (req, res) => {
                 })
             }
         } catch (e) {
+            console.log(e);
+
             res.json({
                 status: 'fail',
-                text: 'Something went wrong to add new student!',
+                text: 'Something went wrong to accept new student!',
                 data: []
             })
         }
@@ -1929,7 +1934,7 @@ app.post('/api/accept/course/request', async (req, res) => {
 app.post('/api/decline/course/request', async (req, res) => {
     let recv = req.body;
     console.log(recv);
-    
+
     if (recv) {
         try {
             let got = await db.collection('requestcourse').doc(recv.id).get();
