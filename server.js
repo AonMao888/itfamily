@@ -2025,6 +2025,71 @@ app.get('/api/check/course/student/:id', async (req, res) => {
         })
     }
 })
+//add new course video
+app.post('/api/new/course/video', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('coursevideo').add({
+                name: recv.name,
+                des: recv.des,
+                num: recv.num,
+                link:recv.link,
+                courseid: recv.courseid,
+                coursename: recv.coursename,
+                courseowneruid: recv.courseowneruid,
+                courseowneremail: recv.courseowneremail,
+                time: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New review was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new review!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new review!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//get specific course requests
+app.get('/api/get/course/videos/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('coursevideo').where('courseid', '==', id).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Videos were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No video was found with this ID.'
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
