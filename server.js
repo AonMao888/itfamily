@@ -2125,7 +2125,7 @@ app.post('/api/update/course/video', async (req, res) => {
         })
     }
 })
-//get specific course requests
+//get specific course videos
 app.get('/api/get/course/videos/:id', async (req, res) => {
     let { id } = req.params;
     let got = await db.collection('coursevideo').where('courseid', '==', id).get();
@@ -2144,6 +2144,129 @@ app.get('/api/get/course/videos/:id', async (req, res) => {
         res.json({
             status: 'fail',
             text: 'No video was found with this ID.'
+        })
+    }
+})
+
+//add new course document
+app.post('/api/new/course/document', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('coursedocument').add({
+                name: recv.name,
+                des: recv.des,
+                num: recv.num,
+                link: recv.link,
+                type: recv.type,
+                courseid: recv.courseid,
+                coursename: recv.coursename,
+                courseowneruid: recv.courseowneruid,
+                courseowneremail: recv.courseowneremail,
+                time: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New document was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new document!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new document!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//update course document
+app.post('/api/update/course/document', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            let got = await db.collection('coursedocument').doc(recv.id).get();
+            if (got.exists) {
+                if (got.data().courseowneruid === recv.requesteruid && got.data().courseowneremail === recv.requesteremail) {
+                    await db.collection('coursedocument').doc(recv.id).update({
+                        name: recv.name,
+                        des: recv.des,
+                        num: recv.num,
+                        link: recv.link,
+                        type: recv.type,
+                    }).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Document was updated.',
+                            data: []
+                        })
+                    }).catch(error => {
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while updating document!',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'Permission required to request!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No document found with this ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new video!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//get specific course documents
+app.get('/api/get/course/documents/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('coursedocument').where('courseid', '==', id).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Documents were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No document was found with this ID.'
         })
     }
 })
