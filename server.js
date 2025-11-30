@@ -2035,6 +2035,7 @@ app.post('/api/new/course/video', async (req, res) => {
                 des: recv.des,
                 num: recv.num,
                 link: recv.link,
+                duration: recv.duration,
                 courseid: recv.courseid,
                 coursename: recv.coursename,
                 courseowneruid: recv.courseowneruid,
@@ -2081,6 +2082,7 @@ app.post('/api/update/course/video', async (req, res) => {
                         des: recv.des,
                         num: recv.num,
                         link: recv.link,
+                        duration: recv.duration,
                     }).then(() => {
                         res.json({
                             status: 'success',
