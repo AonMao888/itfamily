@@ -2084,13 +2084,13 @@ app.post('/api/update/course/video', async (req, res) => {
                     }).then(() => {
                         res.json({
                             status: 'success',
-                            text: 'New video was added.',
+                            text: 'Video was updated.',
                             data: []
                         })
                     }).catch(error => {
                         res.json({
                             status: 'fail',
-                            text: 'Something went wrong while adding new video!',
+                            text: 'Something went wrong while updating video!',
                             data: []
                         })
                     })
