@@ -2001,6 +2001,30 @@ app.get('/api/get/course/requests/:id', async (req, res) => {
         })
     }
 })
+//check specific course student by uid and email
+app.get('/api/check/course/student/:id', async (req, res) => {
+    let { id } = req.params;
+    let {uid,email} = req.query;
+    let got = await db.collection('coursestudents').where('courseid', '==', id).where('studentuid','==',uid).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            requesteddate: getdate(d.data().requestdate),
+            acceptdate: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Students were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No student was found with this ID.'
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
