@@ -2004,8 +2004,8 @@ app.get('/api/get/course/requests/:id', async (req, res) => {
 //check specific course student by uid and email
 app.get('/api/check/course/student/:id', async (req, res) => {
     let { id } = req.params;
-    let {uid,email} = req.query;
-    let got = await db.collection('coursestudents').where('courseid', '==', id).where('studentuid','==',uid).get();
+    let { uid, email } = req.query;
+    let got = await db.collection('coursestudents').where('courseid', '==', id).where('studentuid', '==', uid).get();
     if (!got.empty) {
         let all = got.docs.map((d) => ({
             requesteddate: getdate(d.data().requestdate),
@@ -2034,7 +2034,7 @@ app.post('/api/new/course/video', async (req, res) => {
                 name: recv.name,
                 des: recv.des,
                 num: recv.num,
-                link:recv.link,
+                link: recv.link,
                 courseid: recv.courseid,
                 coursename: recv.coursename,
                 courseowneruid: recv.courseowneruid,
@@ -2043,20 +2043,75 @@ app.post('/api/new/course/video', async (req, res) => {
             }).then(() => {
                 res.json({
                     status: 'success',
-                    text: 'New review was added.',
+                    text: 'New video was added.',
                     data: []
                 })
             }).catch(error => {
                 res.json({
                     status: 'fail',
-                    text: 'Something went wrong while adding new review!',
+                    text: 'Something went wrong while adding new video!',
                     data: []
                 })
             })
         } catch (e) {
             res.json({
                 status: 'fail',
-                text: 'Something went wrong to add new review!',
+                text: 'Something went wrong to add new video!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//update course video
+app.post('/api/update/course/video', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            let got = await db.collection('coursevideo').doc(recv.id).get();
+            if (got.exists) {
+                if (got.data().courseowneruid === recv.requesteruid && got.data().courseowneremail === recv.requesteremail) {
+                    await db.collection('coursevideo').doc(recv.id).update({
+                        name: recv.name,
+                        des: recv.des,
+                        num: recv.num,
+                        link: recv.link,
+                    }).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'New video was added.',
+                            data: []
+                        })
+                    }).catch(error => {
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while adding new video!',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'Permission required to request!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No video found with this ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new video!',
                 data: []
             })
         }
