@@ -2278,6 +2278,7 @@ app.post('/api/new/course/discount', async (req, res) => {
         try {
             await db.collection('coursediscount').add({
                 name: recv.name,
+                code:recv.code,
                 discount: recv.discount,
                 expired: recv.expired,
                 courseid: recv.courseid,
@@ -2323,6 +2324,7 @@ app.post('/api/update/course/discount', async (req, res) => {
                 if (got.data().courseowneruid === recv.requesteruid && got.data().courseowneremail === recv.requesteremail) {
                     await db.collection('coursediscount').doc(recv.id).update({
                         name: recv.name,
+                        code:recv.code,
                         discount: recv.discount,
                         expired: recv.expired,
                     }).then(() => {
