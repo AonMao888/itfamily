@@ -2271,6 +2271,125 @@ app.get('/api/get/course/documents/:id', async (req, res) => {
     }
 })
 
+//add new course discount
+app.post('/api/new/course/discount', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('coursediscount').add({
+                name: recv.name,
+                discount: recv.discount,
+                expired: recv.expired,
+                courseid: recv.courseid,
+                coursename: recv.coursename,
+                courseowneruid: recv.courseowneruid,
+                courseowneremail: recv.courseowneremail,
+                time: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New discount was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new discount!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new discount!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//update course discount
+app.post('/api/update/course/discount', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            let got = await db.collection('coursediscount').doc(recv.id).get();
+            if (got.exists) {
+                if (got.data().courseowneruid === recv.requesteruid && got.data().courseowneremail === recv.requesteremail) {
+                    await db.collection('coursediscount').doc(recv.id).update({
+                        name: recv.name,
+                        discount: recv.discount,
+                        expired: recv.expired,
+                    }).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Discount was updated.',
+                            data: []
+                        })
+                    }).catch(error => {
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while updating discount!',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'Permission required to request!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No document found with this ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new video!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//get specific course documents
+app.get('/api/get/course/discounts/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('coursediscount').where('courseid', '==', id).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Discounts were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No discount was found with this ID.'
+        })
+    }
+})
+
 app.listen(80, () => {
     console.log('Server was started on port 80.');
 })
