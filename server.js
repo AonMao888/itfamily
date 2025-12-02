@@ -1463,6 +1463,7 @@ app.post('/api/edit/course', async (req, res) => {
                 ownername:recv.ownername,
                 owneraddr:recv.owneraddr,
                 ownerphone:recv.ownerphone,
+                owneracctype:recv.owneracctype,
                 owneracc:recv.owneracc
             }).then(async (ad) => {
                 res.json({
