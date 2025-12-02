@@ -1460,6 +1460,10 @@ app.post('/api/edit/course', async (req, res) => {
                 what: recv.what,
                 price: recv.price,
                 type: recv.type,
+                ownername:recv.ownername,
+                owneraddr:recv.owneraddr,
+                ownerphone:recv.ownerphone,
+                owneracc:recv.owneracc
             }).then(async (ad) => {
                 res.json({
                     status: 'success',
