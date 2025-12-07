@@ -1892,7 +1892,7 @@ app.post('/api/new/course/certificate', async (req, res) => {
     let recv = req.body;
     if (recv) {
         try {
-            let got = await db.collection('coursestudents').where('courseid','==',recv.courseid).where('studentuid','==',recv.studentuid).get();
+            let got = await db.collection('coursestudents').where('courseid', '==', recv.courseid).where('studentuid', '==', recv.studentuid).get();
             if (!got.empty) {
                 await db.collection('coursecertificate').add({
                     time: admin.firestore.FieldValue.serverTimestamp(),
@@ -1905,14 +1905,14 @@ app.post('/api/new/course/certificate', async (req, res) => {
                     studentemail: recv.studentemail,
                     accepteremail: recv.accepteremail,
                     accepteruid: recv.accepteruid,
-                    registertime:got.docs[0].data().time,
+                    registertime: got.docs[0].data().time,
                     note: recv.note,
                     rating: recv.rating,
                     status: recv.status,
                 }).then(() => {
                     res.json({
                         status: 'success',
-                        text: 'Certificate was successfully added to '+recv.studentemail,
+                        text: 'Certificate was successfully added to ' + recv.studentemail,
                         data: []
                     })
                 }).catch(error => {
@@ -1933,6 +1933,52 @@ app.post('/api/new/course/certificate', async (req, res) => {
             res.json({
                 status: 'fail',
                 text: 'Something went wrong to add certificate!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//update course student certificate
+app.post('/api/update/course/certificate', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('coursecertificate').doc(recv.id).update({
+                coursename: recv.coursename,
+                courseid: recv.courseid,
+                courseowneremail: recv.courseowneremail,
+                courseowneruid: recv.courseowneruid,
+                studentname: recv.studentname,
+                studentuid: recv.studentuid,
+                studentemail: recv.studentemail,
+                accepteremail: recv.accepteremail,
+                accepteruid: recv.accepteruid,
+                note: recv.note,
+                rating: recv.rating,
+                status: recv.status,
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'Certificate was successfully updated to ' + recv.studentemail,
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while updating certificate!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update certificate!',
                 data: []
             })
         }
