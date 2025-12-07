@@ -93,7 +93,7 @@ function getdate(e) {
 
 const limiter = rateLimit({
     windowMs: 1 * 1000,
-    max: 5,
+    max: 10,
     standardHeaders: true,
     legacyHeaders: false,
     message: 'Server can request 3 times per second, try again later!'
