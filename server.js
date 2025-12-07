@@ -1460,12 +1460,12 @@ app.post('/api/edit/course', async (req, res) => {
                 what: recv.what,
                 price: recv.price,
                 type: recv.type,
-                thumb:recv.thumb,
-                ownername:recv.ownername,
-                owneraddr:recv.owneraddr,
-                ownerphone:recv.ownerphone,
-                owneracctype:recv.owneracctype,
-                owneracc:recv.owneracc,
+                thumb: recv.thumb,
+                ownername: recv.ownername,
+                owneraddr: recv.owneraddr,
+                ownerphone: recv.ownerphone,
+                owneracctype: recv.owneracctype,
+                owneracc: recv.owneracc,
             }).then(async (ad) => {
                 res.json({
                     status: 'success',
@@ -1782,7 +1782,7 @@ app.post('/api/new/course/request', async (req, res) => {
             await db.collection('requestcourse').add({
                 requestername: recv.requestername,
                 time: admin.firestore.FieldValue.serverTimestamp(),
-                coursename:recv.coursename,
+                coursename: recv.coursename,
                 courseid: recv.courseid,
                 courseowneremail: recv.courseowneremail,
                 courseowneruid: recv.courseowneruid,
@@ -1861,6 +1861,86 @@ app.get('/api/get/course/students/:id', async (req, res) => {
         res.json({
             status: 'fail',
             text: 'No student was found with this ID.'
+        })
+    }
+})
+//get specific course certificate
+app.get('/api/get/course/certificate/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('coursecertificate').where('courseid', '==', id).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            requesteddate: getdate(d.data().requestdate),
+            acceptdate: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Certificates were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No certificate was found with this ID.'
+        })
+    }
+})
+//add new course student certificate
+app.post('/api/new/course/certificate', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            let id = recv.courseid + recv.studentuid;
+            let got = await db.collection('coursestudents').doc(id).get();
+            if (got.exists) {
+                await db.collection('coursecertificate').add({
+                    time: admin.firestore.FieldValue.serverTimestamp(),
+                    coursename: recv.coursename,
+                    courseid: recv.courseid,
+                    courseowneremail: recv.courseowneremail,
+                    courseowneruid: recv.courseowneruid,
+                    studentname: recv.studentname,
+                    studentuid: recv.studentuid,
+                    studentemail: recv.studentemail,
+                    accepteremail: recv.accepteremail,
+                    accepteruid: recv.accepteruid,
+                    note: recv.note,
+                    rating: recv.rating,
+                    status: recv.status,
+                }).then(() => {
+                    res.json({
+                        status: 'success',
+                        text: 'Your request was successfully added.',
+                        data: []
+                    })
+                }).catch(error => {
+                    res.json({
+                        status: 'fail',
+                        text: 'Something went wrong while requesting to course!',
+                        data: []
+                    })
+                })
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No student found!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to request course!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
         })
     }
 })
@@ -2283,7 +2363,7 @@ app.post('/api/new/course/discount', async (req, res) => {
         try {
             await db.collection('coursediscount').add({
                 name: recv.name,
-                code:recv.code,
+                code: recv.code,
                 discount: recv.discount,
                 expired: recv.expired,
                 courseid: recv.courseid,
@@ -2329,7 +2409,7 @@ app.post('/api/update/course/discount', async (req, res) => {
                 if (got.data().courseowneruid === recv.requesteruid && got.data().courseowneremail === recv.requesteremail) {
                     await db.collection('coursediscount').doc(recv.id).update({
                         name: recv.name,
-                        code:recv.code,
+                        code: recv.code,
                         discount: recv.discount,
                         expired: recv.expired,
                     }).then(() => {
