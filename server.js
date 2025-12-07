@@ -1777,13 +1777,12 @@ app.get('/api/get/course/reviews/:id', async (req, res) => {
 //add new course student request
 app.post('/api/new/course/request', async (req, res) => {
     let recv = req.body;
-    console.log(recv);
-
     if (recv) {
         try {
             await db.collection('requestcourse').add({
                 requestername: recv.requestername,
                 time: admin.firestore.FieldValue.serverTimestamp(),
+                coursename:recv.coursename,
                 courseid: recv.courseid,
                 courseowneremail: recv.courseowneremail,
                 courseowneruid: recv.courseowneruid,
