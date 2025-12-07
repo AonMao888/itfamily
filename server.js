@@ -1911,13 +1911,13 @@ app.post('/api/new/course/certificate', async (req, res) => {
                 }).then(() => {
                     res.json({
                         status: 'success',
-                        text: 'Your request was successfully added.',
+                        text: 'Certificate was successfully added to '+recv.studentemail,
                         data: []
                     })
                 }).catch(error => {
                     res.json({
                         status: 'fail',
-                        text: 'Something went wrong while requesting to course!',
+                        text: 'Something went wrong while adding certificate!',
                         data: []
                     })
                 })
@@ -1931,7 +1931,7 @@ app.post('/api/new/course/certificate', async (req, res) => {
         } catch (e) {
             res.json({
                 status: 'fail',
-                text: 'Something went wrong to request course!',
+                text: 'Something went wrong to add certificate!',
                 data: []
             })
         }
