@@ -1893,8 +1893,8 @@ app.post('/api/new/course/certificate', async (req, res) => {
     if (recv) {
         try {
             let id = recv.courseid + recv.studentuid;
-            let got = await db.collection('coursestudents').doc(id).get();
-            if (got.exists) {
+            let got = await db.collection('coursestudents').where('courseid','==',recv.courseid).where('studentid','==',recv.studentuid).get();
+            if (!got.empty) {
                 await db.collection('coursecertificate').add({
                     time: admin.firestore.FieldValue.serverTimestamp(),
                     coursename: recv.coursename,
