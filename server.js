@@ -1870,8 +1870,8 @@ app.get('/api/get/course/certificate/:id', async (req, res) => {
     let got = await db.collection('coursecertificate').where('courseid', '==', id).get();
     if (!got.empty) {
         let all = got.docs.map((d) => ({
-            requesteddate: getdate(d.data().requestdate),
-            acceptdate: getdate(d.data().time),
+            registerdate: getdate(d.data().registertime),
+            date: getdate(d.data().time),
             id: d.id,
             ...d.data()
         }))
@@ -1905,6 +1905,7 @@ app.post('/api/new/course/certificate', async (req, res) => {
                     studentemail: recv.studentemail,
                     accepteremail: recv.accepteremail,
                     accepteruid: recv.accepteruid,
+                    registertime:recv.time,
                     note: recv.note,
                     rating: recv.rating,
                     status: recv.status,
