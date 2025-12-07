@@ -1905,7 +1905,7 @@ app.post('/api/new/course/certificate', async (req, res) => {
                     studentemail: recv.studentemail,
                     accepteremail: recv.accepteremail,
                     accepteruid: recv.accepteruid,
-                    registertime:recv.time,
+                    registertime:got.docs[0].data().time,
                     note: recv.note,
                     rating: recv.rating,
                     status: recv.status,
