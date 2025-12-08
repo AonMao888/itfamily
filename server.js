@@ -2545,6 +2545,28 @@ app.get('/api/find/course/:uid', async (req, res) => {
         })
     }
 })
+//find student's certificate
+app.get('/api/find/certificate/:uid', async (req, res) => {
+    let { uid } = req.params;
+    let got = await db.collection('coursecertificate').where('studentuid', '==', uid).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            date: getdate(d.data().time),
+            id: d.id,
+            ...d.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'Certificate found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No certificate was found with this user ID.'
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
