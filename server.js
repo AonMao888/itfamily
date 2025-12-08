@@ -1896,6 +1896,7 @@ app.post('/api/new/course/certificate', async (req, res) => {
             if (!got.empty) {
                 await db.collection('coursecertificate').add({
                     time: admin.firestore.FieldValue.serverTimestamp(),
+                    coursethumb:recv.coursethumb,
                     coursename: recv.coursename,
                     courseid: recv.courseid,
                     courseowneremail: recv.courseowneremail,
@@ -1950,6 +1951,7 @@ app.post('/api/update/course/certificate', async (req, res) => {
     if (recv) {
         try {
             await db.collection('coursecertificate').doc(recv.id).update({
+                coursethumb:recv.coursethumb,
                 coursename: recv.coursename,
                 courseid: recv.courseid,
                 courseowneremail: recv.courseowneremail,
