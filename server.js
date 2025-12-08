@@ -1887,6 +1887,29 @@ app.get('/api/get/course/certificate/:id', async (req, res) => {
         })
     }
 })
+//get specific course certificate
+app.get('/api/get/student/certificate/:id', async (req, res) => {
+    let { id } = req.params;
+    let got = await db.collection('coursecertificate').doc(id).get();
+    if (got.exists) {
+        let all = {
+            registerdate: getdate(got.data().registertime),
+            date: getdate(got.data().time),
+            id: got.id,
+            ...got.data()
+        }
+        res.json({
+            status: 'success',
+            text: 'Certificates were found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No certificate was found with this ID.'
+        })
+    }
+})
 //add new course student certificate
 app.post('/api/new/course/certificate', async (req, res) => {
     let recv = req.body;
