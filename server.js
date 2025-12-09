@@ -1919,10 +1919,10 @@ app.post('/api/new/course/certificate', async (req, res) => {
             if (!got.empty) {
                 await db.collection('coursecertificate').add({
                     time: admin.firestore.FieldValue.serverTimestamp(),
-                    coursethumb:recv.coursethumb,
+                    coursethumb: recv.coursethumb,
                     coursename: recv.coursename,
                     courseid: recv.courseid,
-                    courseownername:recv.courseownername,
+                    courseownername: recv.courseownername,
                     courseowneremail: recv.courseowneremail,
                     courseowneruid: recv.courseowneruid,
                     studentname: recv.studentname,
@@ -1975,10 +1975,10 @@ app.post('/api/update/course/certificate', async (req, res) => {
     if (recv) {
         try {
             await db.collection('coursecertificate').doc(recv.id).update({
-                coursethumb:recv.coursethumb,
+                coursethumb: recv.coursethumb,
                 coursename: recv.coursename,
                 courseid: recv.courseid,
-                courseownername:recv.courseownername,
+                courseownername: recv.courseownername,
                 courseowneremail: recv.courseowneremail,
                 courseowneruid: recv.courseowneruid,
                 studentname: recv.studentname,
@@ -2591,6 +2591,35 @@ app.get('/api/find/certificate/:uid', async (req, res) => {
         res.json({
             status: 'fail',
             text: 'No certificate was found with this user ID.'
+        })
+    }
+})
+
+//get numbers for learning
+app.get('/api/get/numbers/learning', async (req, res) => {
+    try {
+        let stugot = await db.collection('coursestudents').get();
+        let stunum = stugot.docs.length;
+        let coursegot = await db.collection('courses').get();
+        let coursenum = coursegot.docs.length;
+        let certgot = await db.collection('coursecertificate').get();
+        let certnum = certgot.docs.length;
+        let j = {
+            students: stunum,
+            courses: coursenum,
+            certificates: certnum
+        };
+        res.json({
+            status: 'success',
+            text: 'Numbers were got.',
+            data: j
+        })
+    }catch(e){
+        console.log(e);
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
         })
     }
 })
