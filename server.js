@@ -1461,6 +1461,7 @@ app.post('/api/edit/course', async (req, res) => {
                 price: recv.price,
                 type: recv.type,
                 thumb: recv.thumb,
+                require:recv.require,
                 ownername: recv.ownername,
                 owneraddr: recv.owneraddr,
                 ownerphone: recv.ownerphone,
