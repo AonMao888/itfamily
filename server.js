@@ -2287,7 +2287,7 @@ app.post('/api/update/course/video', async (req, res) => {
 //get specific course videos
 app.get('/api/get/course/videos/:id', async (req, res) => {
     let { id } = req.params;
-    let got = await db.collection('coursevideo').where('courseid', '==', id).get();
+    let got = await db.collection('coursevideo').where('courseid', '==', id).orderBy('time','desc').get();
     if (!got.empty) {
         let all = got.docs.map((d) => ({
             date: getdate(d.data().time),
