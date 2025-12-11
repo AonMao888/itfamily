@@ -2031,6 +2031,7 @@ app.post('/api/accept/course/request', async (req, res) => {
                     await db.collection('coursestudents').doc(did).set({
                         studentname: gotdata.requestername,
                         time: admin.firestore.FieldValue.serverTimestamp(),
+                        coursename:gotdata.coursename,
                         courseid: gotdata.courseid,
                         studentuid: gotdata.requesteruid,
                         studentemail: gotdata.requesteremail,
