@@ -2677,6 +2677,37 @@ app.post('/api/summer/2026/addstudent', async (req, res) => {
         })
     }
 })
+//get all summer student 2026
+app.get('/api/summer/2026/students', async (req, res) => {
+    try {
+        const snapshot = await db.collection('summer2026').get();
+        if (snapshot.empty) {
+            return res.json({
+                status: 'success',
+                text: 'No students found!',
+                data: []
+            });
+        }
+        let students = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        res.json({
+            status: 'success',
+            text: 'All students got.',
+            data: students
+        });
+
+    } catch (error) {
+        console.error("Error fetching students:", error);
+        res.status(500).json({
+            status: 'error',
+            text: error.message,
+            data: []
+        });
+    }
+});
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
