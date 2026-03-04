@@ -2626,6 +2626,58 @@ app.get('/api/get/numbers/learning', async (req, res) => {
     }
 })
 
+//add summer 2026 student
+app.post('/api/summer/2026/addstudent', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('summer2026').add({
+                name: recv.name,
+                birth: recv.birth,
+                age: recv.age,
+                address: recv.address,
+                class: recv.class,
+                previousclass: recv.previousclass,
+                previousschool: recv.previousschool,
+                studentphone: recv.studentphone,
+                hobby:recv.hobby,
+                dream:recv.dream,
+                email:recv.email,
+                telegram:recv.telegram,
+                parentname:recv.parentname,
+                parentphone:recv.parentphone,
+                aimtoschool:recv.aimtoschool,
+                howknow:recv.howknow,
+                time: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'Form was requested.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while requesting!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to request new student!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+
 app.listen(80, () => {
     console.log('Server was started on port 80.');
 })
