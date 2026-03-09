@@ -2708,6 +2708,52 @@ app.get('/api/summer/2026/students', async (req, res) => {
         });
     }
 });
+//update student in summer 2026
+app.post('/api/summer/2026/updatestudent/:id', async (req, res) => {
+    let recv = req.body;
+    let {id} = req.params;
+    if (recv && id) {
+        try {
+            await db.collection('summer2026').doc(id).update({
+                name: recv.name,
+                birth: recv.birth,
+                age: recv.age,
+                address: recv.address,
+                class: recv.class,
+                previousclass: recv.previousclass,
+                previousschool: recv.previousschool,
+                email:recv.email,
+                telegram:recv.telegram,
+                parentname:recv.parentname,
+                parentphone:recv.parentphone,
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'Data was updated.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while updating!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update student data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
