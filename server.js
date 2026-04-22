@@ -2726,6 +2726,7 @@ app.post('/api/summer/2026/updatestudent/:id', async (req, res) => {
                 telegram:recv.telegram,
                 parentname:recv.parentname,
                 parentphone:recv.parentphone,
+                sid: recv.sid
             }).then(() => {
                 res.json({
                     status: 'success',
@@ -2733,6 +2734,8 @@ app.post('/api/summer/2026/updatestudent/:id', async (req, res) => {
                     data: []
                 })
             }).catch(error => {
+                console.log(error);
+                
                 res.json({
                     status: 'fail',
                     text: 'Something went wrong while updating!',
