@@ -1461,7 +1461,7 @@ app.post('/api/edit/course', async (req, res) => {
                 price: recv.price,
                 type: recv.type,
                 thumb: recv.thumb,
-                require:recv.require,
+                require: recv.require,
                 ownername: recv.ownername,
                 owneraddr: recv.owneraddr,
                 ownerphone: recv.ownerphone,
@@ -2031,7 +2031,7 @@ app.post('/api/accept/course/request', async (req, res) => {
                     await db.collection('coursestudents').doc(did).set({
                         studentname: gotdata.requestername,
                         time: admin.firestore.FieldValue.serverTimestamp(),
-                        coursename:gotdata.coursename,
+                        coursename: gotdata.coursename,
                         courseid: gotdata.courseid,
                         studentuid: gotdata.requesteruid,
                         studentemail: gotdata.requesteremail,
@@ -2288,7 +2288,7 @@ app.post('/api/update/course/video', async (req, res) => {
 //get specific course videos
 app.get('/api/get/course/videos/:id', async (req, res) => {
     let { id } = req.params;
-    let got = await db.collection('coursevideo').where('courseid', '==', id).orderBy('time','desc').get();
+    let got = await db.collection('coursevideo').where('courseid', '==', id).orderBy('time', 'desc').get();
     if (!got.empty) {
         let all = got.docs.map((d) => ({
             date: getdate(d.data().time),
@@ -2616,7 +2616,7 @@ app.get('/api/get/numbers/learning', async (req, res) => {
             text: 'Numbers were got.',
             data: j
         })
-    }catch(e){
+    } catch (e) {
         console.log(e);
         res.json({
             status: 'fail',
@@ -2640,14 +2640,14 @@ app.post('/api/summer/2026/addstudent', async (req, res) => {
                 previousclass: recv.previousclass,
                 previousschool: recv.previousschool,
                 studentphone: recv.studentphone,
-                hobby:recv.hobby,
-                dream:recv.dream,
-                email:recv.email,
-                telegram:recv.telegram,
-                parentname:recv.parentname,
-                parentphone:recv.parentphone,
-                aimtoschool:recv.aimtoschool,
-                howknow:recv.howknow,
+                hobby: recv.hobby,
+                dream: recv.dream,
+                email: recv.email,
+                telegram: recv.telegram,
+                parentname: recv.parentname,
+                parentphone: recv.parentphone,
+                aimtoschool: recv.aimtoschool,
+                howknow: recv.howknow,
                 time: admin.firestore.FieldValue.serverTimestamp(),
             }).then(() => {
                 res.json({
@@ -2711,7 +2711,7 @@ app.get('/api/summer/2026/students', async (req, res) => {
 //update student in summer 2026
 app.post('/api/summer/2026/updatestudent/:id', async (req, res) => {
     let recv = req.body;
-    let {id} = req.params;
+    let { id } = req.params;
     if (recv && id) {
         try {
             await db.collection('summer2026').doc(id).update({
@@ -2722,10 +2722,10 @@ app.post('/api/summer/2026/updatestudent/:id', async (req, res) => {
                 class: recv.class,
                 previousclass: recv.previousclass,
                 previousschool: recv.previousschool,
-                email:recv.email,
-                telegram:recv.telegram,
-                parentname:recv.parentname,
-                parentphone:recv.parentphone,
+                email: recv.email,
+                telegram: recv.telegram,
+                parentname: recv.parentname,
+                parentphone: recv.parentphone,
                 sid: recv.sid
             }).then(() => {
                 res.json({
@@ -2735,7 +2735,7 @@ app.post('/api/summer/2026/updatestudent/:id', async (req, res) => {
                 })
             }).catch(error => {
                 console.log(error);
-                
+
                 res.json({
                     status: 'fail',
                     text: 'Something went wrong while updating!',
@@ -2755,6 +2755,74 @@ app.post('/api/summer/2026/updatestudent/:id', async (req, res) => {
             text: 'Something went wrong!',
             data: []
         })
+    }
+})
+//get all summer teachers 2026
+app.get('/api/summer/teachers', async (req, res) => {
+    try {
+        const snapshot = await db.collection('summerteachers').get();
+        if (snapshot.empty) {
+            return res.json({
+                status: 'success',
+                text: 'No teachers found!',
+                data: []
+            });
+        }
+        let students = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        res.json({
+            status: 'success',
+            text: 'All teachers got.',
+            data: students
+        });
+
+    } catch (error) {
+        console.error("Error fetching teachers:", error);
+        res.status(500).json({
+            status: 'error',
+            text: error.message,
+            data: []
+        });
+    }
+});
+//check is summer teacher or not
+app.post('/api/issummerteacher', async (req, res) => {
+    let { email } = req.query;
+    if (email) {
+        try {
+            let got = await db.collection('summerteachers').where('email', '==', email).get();
+            if (got) {
+                let da = got.docs[0].data();
+                res.json({
+                    status: 'success',
+                    text: 'All teachers got.',
+                    data: da
+                });
+            } else {
+                console.log(e);
+                res.json({
+                    status: 'error',
+                    text: 'No teacher found!',
+                    data: []
+                });
+            } 
+        } catch (e) {
+            console.log(e);
+            res.json({
+                status: 'error',
+                text: 'Something went wrong!',
+                data: []
+            });
+        }
+    } else {
+        res.json({
+            status: 'error',
+            text: 'Teacher email was required!',
+            data: []
+        });
     }
 })
 
