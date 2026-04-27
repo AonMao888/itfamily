@@ -2789,7 +2789,7 @@ app.get('/api/summer/teachers', async (req, res) => {
     }
 });
 //check is summer teacher or not
-app.post('/api/issummerteacher', async (req, res) => {
+app.get('/api/issummerteacher', async (req, res) => {
     let { email } = req.query;
     if (email) {
         try {
@@ -2823,6 +2823,48 @@ app.post('/api/issummerteacher', async (req, res) => {
             text: 'Teacher email was required!',
             data: []
         });
+    }
+})
+//update student in summer 2026 by teacher
+app.post('/api/summer/2026/teacher/updatestudent/:id', async (req, res) => {
+    let recv = req.body;
+    let { id } = req.params;
+    if (recv && id) {
+        try {
+            await db.collection('summer2026').doc(id).update({
+                [recv.subject]:{
+                    mark: recv.mark,
+                    rating: recv.rating,
+                    note: recv.note
+                }
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'Data was updated.',
+                    data: []
+                })
+            }).catch(error => {
+                console.log(error);
+
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while updating!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update student data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
     }
 })
 
