@@ -2875,7 +2875,7 @@ app.post('/api/summer/2026/attendance/updatestudent/:id', async (req, res) => {
         try {
             await db.collection('summer2026').doc(id).update({
                 marchatt:recv.marchatt,
-                april:recv.april.att,
+                april:recv.aprilatt,
                 may:recv.mayatt
             }).then(() => {
                 res.json({
