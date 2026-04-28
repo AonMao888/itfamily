@@ -2867,6 +2867,46 @@ app.post('/api/summer/2026/teacher/updatestudent/:id', async (req, res) => {
         })
     }
 })
+//update student's attendance
+app.post('/api/summer/2026/attendance/updatestudent/:id', async (req, res) => {
+    let recv = req.body;
+    let { id } = req.params;
+    if (recv && id) {
+        try {
+            await db.collection('summer2026').doc(id).update({
+                marchatt:recv.marchatt,
+                april:recv.april.att,
+                may:recv.mayatt
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'Data was updated.',
+                    data: []
+                })
+            }).catch(error => {
+                console.log(error);
+
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while updating!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update student data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
