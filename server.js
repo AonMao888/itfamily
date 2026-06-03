@@ -504,7 +504,6 @@ app.post('/api/sailukhen', async (req, res) => {
                 status: 'attending',
                 role: 'student',
                 time: admin.firestore.FieldValue.serverTimestamp(),
-                sid: recv.sid,
                 currentage: recv.currentage,
                 email: recv.email,
                 key: generatekey(recv.sid)
