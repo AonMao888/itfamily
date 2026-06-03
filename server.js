@@ -651,7 +651,6 @@ app.post('/api/morlukhen', async (req, res) => {
                         birthdate: recv.birthdate,
                         sid: recv.sid,
                         email: recv.email,
-                        key: generatekey(recv.sid)
                     }).then(async () => {
                         await db.collection('students').doc(recv.docid).delete().then(() => {
                             res.json({
