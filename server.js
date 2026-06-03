@@ -650,7 +650,6 @@ app.post('/api/morlukhen', async (req, res) => {
                         level: recv.level,
                         birthdate: recv.birthdate,
                         sid: recv.sid,
-                        accid: recv.accid,
                         email: recv.email,
                         key: generatekey(recv.sid)
                     }).then(async () => {
