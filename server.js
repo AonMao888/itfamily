@@ -661,6 +661,8 @@ app.post('/api/morlukhen', async (req, res) => {
                                 data: []
                             })
                         }).catch((e) => {
+                            console.log(e);
+                            
                             res.json({
                                 status: 'fail',
                                 text: 'Something went wrong while deleting student!',
@@ -668,6 +670,8 @@ app.post('/api/morlukhen', async (req, res) => {
                             })
                         })
                     }).catch(error => {
+                        console.log(error);
+                        
                         res.json({
                             status: 'fail',
                             text: 'Something went wrong while updating student!',
@@ -675,6 +679,8 @@ app.post('/api/morlukhen', async (req, res) => {
                         })
                     })
                 } catch (e) {
+                    console.log(e);
+                    
                     res.json({
                         status: 'fail',
                         text: 'Something went wrong to update student data!',
