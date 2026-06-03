@@ -505,7 +505,7 @@ app.post('/api/sailukhen', async (req, res) => {
                 role: 'student',
                 time: admin.firestore.FieldValue.serverTimestamp(),
                 sid: recv.sid,
-                accid: recv.accid,
+                currentage: recv.currentage,
                 email: recv.email,
                 key: generatekey(recv.sid)
             }).then(() => {
@@ -2875,8 +2875,8 @@ app.post('/api/summer/2026/attendance/updatestudent/:id', async (req, res) => {
         try {
             await db.collection('summer2026').doc(id).update({
                 marchatt:recv.marchatt,
-                april:recv.aprilatt,
-                may:recv.mayatt
+                aprilatt:recv.aprilatt,
+                mayatt:recv.mayatt
             }).then(() => {
                 res.json({
                     status: 'success',
