@@ -551,7 +551,6 @@ app.post('/api/maylukhen', async (req, res) => {
                 birthdate: recv.birthdate,
                 level: recv.level,
                 sid: recv.sid,
-                accid: recv.accid,
                 email: recv.email,
                 key: generatekey(recv.sid)
             }).then(() => {
@@ -561,6 +560,8 @@ app.post('/api/maylukhen', async (req, res) => {
                     data: []
                 })
             }).catch(error => {
+                console.log(error);
+                
                 res.json({
                     status: 'fail',
                     text: 'Something went wrong while updating student!',
@@ -568,6 +569,8 @@ app.post('/api/maylukhen', async (req, res) => {
                 })
             })
         } catch (e) {
+            console.log(e);
+            
             res.json({
                 status: 'fail',
                 text: 'Something went wrong to update student data!',
@@ -2909,6 +2912,107 @@ app.post('/api/summer/2026/attendance/updatestudent/:id', async (req, res) => {
             text: 'Something went wrong!',
             data: []
         })
+    }
+})
+
+//update student 2026 by teacher
+app.post('/api/students/2026/teacher/updatestudent/:id', async (req, res) => {
+    let recv = req.body;
+    let { id } = req.params;
+    if (recv && id) {
+        try {
+            await db.collection('students').doc(id).update({
+                [recv.subject]:{
+                    mark: recv.mark,
+                    note: recv.note
+                }
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'Data was updated.',
+                    data: []
+                })
+            }).catch(error => {
+                console.log(error);
+
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while updating!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update student data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//get student's profile
+app.get('/api/get/profile/:uid', async (req, res) => {
+    let { uid } = req.params;
+    let got = await db.collection('students').doc(uid).get();
+    if (got.exists) {
+        let all = {
+            date: getdate(got.data().time),
+            id: got.id,
+            ...got.data()
+        }
+        res.json({
+            status: 'success',
+            text: 'Profile found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No profile was found with this ID.'
+        })
+    }
+})
+//check is school teacher or not
+app.get('/api/isschoolteacher', async (req, res) => {
+    let { email } = req.query;
+    if (email) {
+        try {
+            let got = await db.collection('teachers').where('email', '==', email).get();
+            if (got) {
+                let da = got.docs[0].data();
+                res.json({
+                    status: 'success',
+                    text: 'Teacher was got.',
+                    data: da
+                });
+            } else {
+                console.log(e);
+                res.json({
+                    status: 'error',
+                    text: 'No teacher found!',
+                    data: []
+                });
+            } 
+        } catch (e) {
+            console.log(e);
+            res.json({
+                status: 'error',
+                text: 'Something went wrong!',
+                data: []
+            });
+        }
+    } else {
+        res.json({
+            status: 'error',
+            text: 'Teacher email was required!',
+            data: []
+        });
     }
 })
 
