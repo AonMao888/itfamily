@@ -502,7 +502,7 @@ app.post('/api/sailukhen', async (req, res) => {
                 birthdate: recv.birthdate,
                 level: recv.level,
                 status: 'attending',
-                sid:recv.sid,
+                sid: recv.sid,
                 role: 'student',
                 time: admin.firestore.FieldValue.serverTimestamp(),
                 currentage: recv.currentage,
@@ -561,7 +561,7 @@ app.post('/api/maylukhen', async (req, res) => {
                 })
             }).catch(error => {
                 console.log(error);
-                
+
                 res.json({
                     status: 'fail',
                     text: 'Something went wrong while updating student!',
@@ -570,7 +570,7 @@ app.post('/api/maylukhen', async (req, res) => {
             })
         } catch (e) {
             console.log(e);
-            
+
             res.json({
                 status: 'fail',
                 text: 'Something went wrong to update student data!',
@@ -663,7 +663,7 @@ app.post('/api/morlukhen', async (req, res) => {
                             })
                         }).catch((e) => {
                             console.log(e);
-                            
+
                             res.json({
                                 status: 'fail',
                                 text: 'Something went wrong while deleting student!',
@@ -672,7 +672,7 @@ app.post('/api/morlukhen', async (req, res) => {
                         })
                     }).catch(error => {
                         console.log(error);
-                        
+
                         res.json({
                             status: 'fail',
                             text: 'Something went wrong while updating student!',
@@ -681,7 +681,7 @@ app.post('/api/morlukhen', async (req, res) => {
                     })
                 } catch (e) {
                     console.log(e);
-                    
+
                     res.json({
                         status: 'fail',
                         text: 'Something went wrong to update student data!',
@@ -2815,7 +2815,7 @@ app.get('/api/issummerteacher', async (req, res) => {
                     text: 'No teacher found!',
                     data: []
                 });
-            } 
+            }
         } catch (e) {
             console.log(e);
             res.json({
@@ -2839,7 +2839,7 @@ app.post('/api/summer/2026/teacher/updatestudent/:id', async (req, res) => {
     if (recv && id) {
         try {
             await db.collection('summer2026').doc(id).update({
-                [recv.subject]:{
+                [recv.subject]: {
                     mark: recv.mark,
                     rating: recv.rating,
                     note: recv.note
@@ -2881,9 +2881,9 @@ app.post('/api/summer/2026/attendance/updatestudent/:id', async (req, res) => {
     if (recv && id) {
         try {
             await db.collection('summer2026').doc(id).update({
-                marchatt:recv.marchatt,
-                aprilatt:recv.aprilatt,
-                mayatt:recv.mayatt
+                marchatt: recv.marchatt,
+                aprilatt: recv.aprilatt,
+                mayatt: recv.mayatt
             }).then(() => {
                 res.json({
                     status: 'success',
@@ -2922,7 +2922,7 @@ app.post('/api/students/2026/teacher/updatestudent/:id', async (req, res) => {
     if (recv && id) {
         try {
             await db.collection('students').doc(id).update({
-                [recv.subject]:{
+                [recv.subject]: {
                     mark: recv.mark,
                     note: recv.note
                 }
@@ -2998,7 +2998,7 @@ app.get('/api/isschoolteacher', async (req, res) => {
                     text: 'No teacher found!',
                     data: []
                 });
-            } 
+            }
         } catch (e) {
             console.log(e);
             res.json({
@@ -3013,6 +3013,61 @@ app.get('/api/isschoolteacher', async (req, res) => {
             text: 'Teacher email was required!',
             data: []
         });
+    }
+})
+//student update his/her about
+app.post('/api/student/update/about/:id', async (req, res) => {
+    let recv = req.body;
+    let { id } = req.params;
+    if (recv && id) {
+        try {
+            let bget = await db.collection('students').doc(id).get();
+            if (bget.exists) {
+                let dd = bget.data();
+                if (dd.key === recv.key) {
+                    await db.collection('students').doc(id).update({
+                        aboutme:recv.aboutme
+                    }).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'About was updated.',
+                            data: []
+                        })
+                    }).catch(error => {
+                        console.log(error);
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while updating!',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'Invalid student key!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No student found with this ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update student data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
     }
 })
 
