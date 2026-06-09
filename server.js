@@ -3070,6 +3070,61 @@ app.post('/api/student/update/about/:id', async (req, res) => {
         })
     }
 })
+//update student attendance percent
+app.post('/api/update/student/attendance/percent/:id', async (req, res) => {
+    let recv = req.body;
+    let { id } = req.params;
+    if (recv && id) {
+        try {
+            let bget = await db.collection('students').doc(id).get();
+            if (bget.exists) {
+                let dd = bget.data();
+                if (dd.key === recv.key) {
+                    await db.collection('students').doc(id).update({
+                        attendancepercent:recv.attendancepercent
+                    }).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Student attendance percent was updated.',
+                            data: []
+                        })
+                    }).catch(error => {
+                        console.log(error);
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while updating!',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'Invalid student key!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No student found with this ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update student data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
 
 app.listen(80, () => {
     console.log('Server was started on port 80.');
