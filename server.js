@@ -725,7 +725,6 @@ app.post('/api/saimawsom', async (req, res) => {
                 contact: recv.contact,
                 email: recv.email,
                 status: 'active',
-                role: 'teacher',
                 time: admin.firestore.FieldValue.serverTimestamp(),
                 tid: recv.tid,
                 key: generatekey(recv.tid)
@@ -826,6 +825,7 @@ app.post('/api/mormawsom', async (req, res) => {
                                 data: []
                             })
                         }).catch((e) => {
+                            console.log(e);
                             res.json({
                                 status: 'fail',
                                 text: 'Something went wrong while deleting teacher!',
@@ -833,6 +833,8 @@ app.post('/api/mormawsom', async (req, res) => {
                             })
                         })
                     }).catch(error => {
+                        console.log(error);
+                        
                         res.json({
                             status: 'fail',
                             text: 'Something went wrong while deleting teacher!',
@@ -840,6 +842,7 @@ app.post('/api/mormawsom', async (req, res) => {
                         })
                     })
                 } catch (e) {
+                    console.log(e);
                     res.json({
                         status: 'fail',
                         text: 'Something went wrong to update teacher data!',
