@@ -721,7 +721,7 @@ app.post('/api/saimawsom', async (req, res) => {
                 gender: recv.gender,
                 address: recv.address,
                 city: recv.city,
-                sub: recv.sub,
+                subject: recv.sub,
                 contact: recv.contact,
                 email: recv.email,
                 status: 'active',
