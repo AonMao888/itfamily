@@ -2987,8 +2987,12 @@ app.get('/api/isschoolteacher', async (req, res) => {
     if (email) {
         try {
             let got = await db.collection('teachers').where('email', '==', email).get();
-            if (got) {
-                let da = got.docs[0].data();
+            if (!got.empty) {
+                //let da = got.docs[0].data();
+                let da = got.docs.map((item)=>({
+                    id:item.id,
+                    ...item.data()
+                }))
                 res.json({
                     status: 'success',
                     text: 'Teacher was got.',
