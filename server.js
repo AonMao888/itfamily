@@ -3022,6 +3022,47 @@ app.get('/api/isschoolteacher', async (req, res) => {
         });
     }
 })
+//check is school student or not
+app.get('/api/isschoolstudent', async (req, res) => {
+    let { email } = req.query;
+    if (email) {
+        try {
+            let got = await db.collection('students').where('email', '==', email).get();
+            if (!got.empty) {
+                let da = got.docs[0].data();
+                /*let da = got.docs.map((item)=>({
+                    id:item.id,
+                    ...item.data()
+                }))*/
+                res.json({
+                    status: 'success',
+                    text: 'Student was got.',
+                    data: da
+                });
+            } else {
+                console.log(e);
+                res.json({
+                    status: 'error',
+                    text: 'No student found!',
+                    data: []
+                });
+            }
+        } catch (e) {
+            console.log(e);
+            res.json({
+                status: 'error',
+                text: 'Something went wrong!',
+                data: []
+            });
+        }
+    } else {
+        res.json({
+            status: 'error',
+            text: 'Student email was required!',
+            data: []
+        });
+    }
+})
 //student update his/her about
 app.post('/api/student/update/about/:id', async (req, res) => {
     let recv = req.body;
