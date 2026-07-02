@@ -2984,8 +2984,8 @@ app.get('/api/get/profile/:uid', async (req, res) => {
 //parent get student's profile
 app.get('/api/parent/access/student/:code', async (req, res) => {
     let { code } = req.params;
-    let id = code.split('%')[0];
-    let key = code.split('%')[1];
+    let id = code.split('@')[0];
+    let key = code.split('@')[1];
     let got = await db.collection('students').doc(id).get();
     if (got.exists) {
         if (got.data().key === key) {
@@ -2994,11 +2994,7 @@ app.get('/api/parent/access/student/:code', async (req, res) => {
                 id: got.id,
                 ...got.data()
             }
-            res.json({
-                status: 'success',
-                text: 'Profile found.',
-                data: all
-            })
+            res.json(all)
         } else {
             res.json({
                 status: 'fail',
