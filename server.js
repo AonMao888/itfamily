@@ -834,7 +834,7 @@ app.post('/api/mormawsom', async (req, res) => {
                         })
                     }).catch(error => {
                         console.log(error);
-                        
+
                         res.json({
                             status: 'fail',
                             text: 'Something went wrong while deleting teacher!',
@@ -2981,6 +2981,37 @@ app.get('/api/get/profile/:uid', async (req, res) => {
         })
     }
 })
+//parent get student's profile
+app.get('/api/parent/access/student/:code', async (req, res) => {
+    let { code } = req.params;
+    let id = code.split('%')[0];
+    let key = code.split('%')[1];
+    let got = await db.collection('students').doc(id).get();
+    if (got.exists) {
+        if (got.data().key === key) {
+            let all = {
+                date: getdate(got.data().time),
+                id: got.id,
+                ...got.data()
+            }
+            res.json({
+                status: 'success',
+                text: 'Profile found.',
+                data: all
+            })
+        } else {
+            res.json({
+                status: 'fail',
+                text: 'Key was invalid!'
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No student was found with this ID.'
+        })
+    }
+})
 //check is school teacher or not
 app.get('/api/isschoolteacher', async (req, res) => {
     let { email } = req.query;
@@ -2989,8 +3020,8 @@ app.get('/api/isschoolteacher', async (req, res) => {
             let got = await db.collection('teachers').where('email', '==', email).get();
             if (!got.empty) {
                 //let da = got.docs[0].data();
-                let da = got.docs.map((item)=>({
-                    id:item.id,
+                let da = got.docs.map((item) => ({
+                    id: item.id,
                     ...item.data()
                 }))
                 res.json({
@@ -3074,7 +3105,7 @@ app.post('/api/student/update/about/:id', async (req, res) => {
                 let dd = bget.data();
                 if (dd.key === recv.key) {
                     await db.collection('students').doc(id).update({
-                        aboutme:recv.aboutme
+                        aboutme: recv.aboutme
                     }).then(() => {
                         res.json({
                             status: 'success',
@@ -3129,7 +3160,7 @@ app.post('/api/update/student/attendance/percent/:id', async (req, res) => {
                 let dd = bget.data();
                 if (dd.key === recv.key) {
                     await db.collection('students').doc(id).update({
-                        attendancepercent:recv.attendancepercent
+                        attendancepercent: recv.attendancepercent
                     }).then(() => {
                         res.json({
                             status: 'success',
