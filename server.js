@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 var admin = require('firebase-admin');
 const rateLimit = require('express-rate-limit');
+const axios = require('axios');
 
 const app = express();
 app.use(express.json());
@@ -3189,6 +3190,201 @@ app.post('/api/update/student/attendance/percent/:id', async (req, res) => {
             res.json({
                 status: 'fail',
                 text: 'Something went wrong to update student data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+
+//get all download keys
+app.get('/api/all/download/keys', async (req, res) => {
+    let got = await db.collection('keys').get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        let d = got.docs.map((doc) => ({
+            id: doc.id,
+            adddatefixed: getdate(doc.data().adddate),
+            useddatefixed: doc.data().useddate && getdate(doc.data().useddate),
+            ...doc.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'All download keys data got.',
+            data: d
+        })
+    }
+})
+//add new download key
+app.post('/api/add/new/download/key', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('keys').doc(recv.key).set({
+                key: recv.key,
+                adddate: admin.firestore.FieldValue.serverTimestamp(),
+                status: 'new',
+                forbook: recv.forbook,
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New download key was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new download key!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new download key!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//check book key
+app.post('/api/check/book/key/:key', async (req, res) => {
+    let recv = req.body;
+    let { key } = req.params;
+    if (recv && key) {
+        try {
+            let bget = await db.collection('keys').doc(key).get();
+            if (bget.exists) {
+                let dd = bget.data();
+                if (dd.key === recv.key && dd.key === key && dd.forbook === recv.forbook) {
+                    if (dd.status === 'new') {
+                        await db.collection('keys').doc(key).update({
+                            status: 'Used',
+                            browser: recv.browser,
+                            devicemodel: recv.devicemodel,
+                            devicevendor: recv.devicevendor,
+                            osname: recv.osname,
+                            useragent: recv.useragent,
+                            useddate: admin.firestore.FieldValue.serverTimestamp()
+                        }).then(async() => {
+                            let pdfUrl = "https://aonmao888.github.io/stuprofile/%E1%82%81%E1%80%B5%E1%81%BC%E1%80%BA%E1%80%B8%E1%80%90%E1%82%85%E1%80%99%E1%80%BA%E1%82%88%E1%81%B6%E1%80%B0%E1%80%90%E1%80%BA%E1%82%89%20Web%20development(full).pdf";
+                            const pdfData = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
+                            const base64Pdf = Buffer.from(pdfData.data).toString('base64');
+                            res.json({
+                                status: 'success',
+                                text: 'Key was valid and successfully used.',
+                                data: {
+                                    pdfBase64: base64Pdf,
+                                    filename: 'ႁဵၼ်းတႅမ်ႈၶူတ်ႉ Web development.pdf'
+                                }
+                            })
+                        }).catch(error => {
+                            console.log(error);
+                            res.json({
+                                status: 'fail',
+                                text: 'Something went wrong while checking key!',
+                                data: []
+                            })
+                        })
+                    } else {
+                        res.json({
+                            status: 'fail',
+                            text: 'This key was already used!',
+                            data: []
+                        })
+                    }
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'Invalid download key!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No download key found with this key!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            console.log(e);
+
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to check download key!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//update key data
+app.post('/api/update/key/data', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            let bget = await db.collection('keys').doc(recv.key).get();
+            if (bget.exists) {
+                let dd = bget.data();
+                if (dd.key === recv.key) {
+                    await db.collection('keys').doc(recv.key).update({
+                        forbook: recv.forbook,
+                        key: recv.key,
+                        status: recv.status
+                    }).then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Key was updated.',
+                            data: []
+                        })
+                    }).catch(error => {
+                        console.log(error);
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while updating!',
+                            data: []
+                        })
+                    })
+                } else {
+                    res.json({
+                        status: 'fail',
+                        text: 'Invalid download key!',
+                        data: []
+                    })
+                }
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No key found with this ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update key data!',
                 data: []
             })
         }
