@@ -3283,16 +3283,10 @@ app.post('/api/check/book/key/:key', async (req, res) => {
                             useragent: recv.useragent,
                             useddate: admin.firestore.FieldValue.serverTimestamp()
                         }).then(async() => {
-                            let pdfUrl = "https://aonmao888.github.io/stuprofile/%E1%82%81%E1%80%B5%E1%81%BC%E1%80%BA%E1%80%B8%E1%80%90%E1%82%85%E1%80%99%E1%80%BA%E1%82%88%E1%81%B6%E1%80%B0%E1%80%90%E1%80%BA%E1%82%89%20Web%20development(full).pdf";
-                            const pdfData = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
-                            const base64Pdf = Buffer.from(pdfData.data).toString('base64');
                             res.json({
                                 status: 'success',
                                 text: 'Key was valid and successfully used.',
-                                data: {
-                                    pdfBase64: base64Pdf,
-                                    filename: 'ႁဵၼ်းတႅမ်ႈၶူတ်ႉ Web development.pdf'
-                                }
+                                data: []
                             })
                         }).catch(error => {
                             console.log(error);
