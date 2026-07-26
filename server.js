@@ -3401,21 +3401,24 @@ function readData() {
 function writeData(data) {
     fs.writeFileSync(COUNTER_FILE, JSON.stringify(data, null, 2));
 }
-app.post('/api/visitor-count', (req, res) => {
+app.post('/api/visitor-count', async (req, res) => {
     const { deviceId } = req.body;
 
     if (!deviceId) {
         return res.status(400).json({ status: 'fail', text: 'Device ID is required' });
     }
-    const data = readData();
-    const exists = data.visitors.includes(deviceId);
-
-    if (!exists) {
-        data.visitors.push(deviceId);
-        data.count = data.visitors.length;
-        writeData(data);
+    const counterRef = await db.collection('visitors').where('deviceId', '==', deviceId).get();
+    if (counterRef.empty) {
+        await db.collection('visitors').doc(deviceId).set({
+            deviceId: deviceId
+        }).then(async() => {
+            const allcounter = await db.collection('visitors').get();
+            res.json({ status: 'success', count: allcounter.docs.length });
+        })
+    } else {
+        const allcounter = await db.collection('visitors').get();
+        res.json({ status: 'success', count: allcounter.docs.length });
     }
-    res.json({ status: 'success', count: data.count });
 })
 
 app.listen(80, () => {
