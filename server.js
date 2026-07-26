@@ -4,6 +4,7 @@ const cors = require('cors');
 var admin = require('firebase-admin');
 const rateLimit = require('express-rate-limit');
 const axios = require('axios');
+const fs = require('fs');
 
 const app = express();
 app.use(express.json());
@@ -11,6 +12,8 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cors({
     origin: '*'
 }));
+
+const COUNTER_FILE = './counter.json';
 
 var cer = {
     "type": "service_account",
@@ -3282,7 +3285,7 @@ app.post('/api/check/book/key/:key', async (req, res) => {
                             osname: recv.osname,
                             useragent: recv.useragent,
                             useddate: admin.firestore.FieldValue.serverTimestamp()
-                        }).then(async() => {
+                        }).then(async () => {
                             res.json({
                                 status: 'success',
                                 text: 'Key was valid and successfully used.',
@@ -3389,6 +3392,30 @@ app.post('/api/update/key/data', async (req, res) => {
             data: []
         })
     }
+})
+
+function readData() {
+    if (!fs.existsSync(COUNTER_FILE)) return { count: 0, visitors: [] };
+    return JSON.parse(fs.readFileSync(COUNTER_FILE));
+}
+function writeData(data) {
+    fs.writeFileSync(COUNTER_FILE, JSON.stringify(data, null, 2));
+}
+app.post('/api/visitor-count', (req, res) => {
+    const { deviceId } = req.body;
+
+    if (!deviceId) {
+        return res.status(400).json({ status: 'fail', text: 'Device ID is required' });
+    }
+    const data = readData();
+    const exists = data.visitors.includes(deviceId);
+
+    if (!exists) {
+        data.visitors.push(deviceId);
+        data.count = data.visitors.length;
+        writeData(data);
+    }
+    res.json({ status: 'success', count: data.count });
 })
 
 app.listen(80, () => {
