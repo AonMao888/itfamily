@@ -2777,7 +2777,7 @@ app.get('/api/summer/teachers', async (req, res) => {
         const snapshot = await db.collection('summerteachers').get();
         if (snapshot.empty) {
             return res.json({
-                status: 'success',
+                status: 'fail',
                 text: 'No teachers found!',
                 data: []
             });
@@ -3205,6 +3205,196 @@ app.post('/api/update/student/attendance/percent/:id', async (req, res) => {
     }
 })
 
+//get all event date
+app.get('/api/all/event/date', async (req, res) => {
+    try {
+        const snapshot = await db.collection('eventdate').get();
+        if (snapshot.empty) {
+            return res.json({
+                status: 'fail',
+                text: 'No event date data found!',
+                data: []
+            });
+        }
+        let eventdates = snapshot.docs.map(doc => ({
+            id: doc.id,
+            addeddatefixed: getdate(doc.data().adddate),
+            ...doc.data()
+        }));
+
+        res.json({
+            status: 'success',
+            text: 'All event date data got.',
+            data: eventdates
+        });
+
+    } catch (error) {
+        console.error("Error fetching event date data:", error);
+        res.status(500).json({
+            status: 'error',
+            text: error.message,
+            data: []
+        });
+    }
+});
+//add new event date
+app.post('/api/add/new/eventdate', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('eventdate').add({
+                name: recv.name,
+                icon: recv.icon,
+                color: recv.color,
+                date: recv.date,
+                des: recv.des,
+                adddate: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New event date was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding new event date!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add new event date!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//update event date
+app.post('/api/update/eventdate/:id', async (req, res) => {
+    let recv = req.body;
+    let { id } = req.params;
+    if (recv && id) {
+        try {
+            let bget = await db.collection('eventdate').doc(id).get();
+            if (bget.exists) {
+                let dd = bget.data();
+                await db.collection('eventdate').doc(id).update({
+                    name: recv.name,
+                    icon: recv.icon,
+                    color: recv.color,
+                    date: recv.date,
+                    des: recv.des,
+                }).then(() => {
+                    res.json({
+                        status: 'success',
+                        text: 'Event date data was updated.',
+                        data: []
+                    })
+                }).catch(error => {
+                    console.log(error);
+                    res.json({
+                        status: 'fail',
+                        text: 'Something went wrong while updating!',
+                        data: []
+                    })
+                })
+            } else {
+                res.json({
+                    status: 'fail',
+                    text: 'No event date data found with this ID!',
+                    data: []
+                })
+            }
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update event date data!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//delete event date
+app.post('/api/delete/event/date', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        let got = await db.collection('eventdate').doc(recv.id).get();
+        if (got.exists) {
+            let gotdata = got.data();
+            try {
+                await db.collection('deletedeventdate').add({
+                    name: gotdata.name,
+                    icon: gotdata.icon,
+                    color: gotdata.color,
+                    date: gotdata.date,
+                    des: gotdata.des,
+                    adddate: gotdata.adddate,
+                    deleteddate: admin.firestore.FieldValue.serverTimestamp(),
+                }).then(async () => {
+                    await db.collection('eventdate').doc(recv.id).delete().then(() => {
+                        res.json({
+                            status: 'success',
+                            text: 'Event date data was deleted.',
+                            data: []
+                        })
+                    }).catch((e) => {
+                        console.log(e);
+
+                        res.json({
+                            status: 'fail',
+                            text: 'Something went wrong while deleting event date data!',
+                            data: []
+                        })
+                    })
+                }).catch(error => {
+                    console.log(error);
+
+                    res.json({
+                        status: 'fail',
+                        text: 'Something went wrong while updating event date data!',
+                        data: []
+                    })
+                })
+            } catch (e) {
+                console.log(e);
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong to update event date data!',
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 'fail',
+                text: 'No event date data found!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+
+
+
 //get all download keys
 app.get('/api/all/download/keys', async (req, res) => {
     let got = await db.collection('keys').get();
@@ -3411,7 +3601,7 @@ app.post('/api/visitor-count', async (req, res) => {
     if (counterRef.empty) {
         await db.collection('visitors').doc(deviceId).set({
             deviceId: deviceId
-        }).then(async() => {
+        }).then(async () => {
             const allcounter = await db.collection('visitors').get();
             res.json({ status: 'success', count: allcounter.docs.length });
         })
