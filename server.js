@@ -3595,7 +3595,7 @@ app.post('/api/visitor-count', async (req, res) => {
     const { deviceId } = req.body;
 
     if (!deviceId) {
-        return res.status(400).json({ status: 'fail', text: 'Device ID is required' });
+        return res.json({ status: 'fail', text: 'Device ID is required' });
     }
     const counterRef = await db.collection('visitors').where('deviceId', '==', deviceId).get();
     if (counterRef.empty) {
@@ -3608,6 +3608,31 @@ app.post('/api/visitor-count', async (req, res) => {
     } else {
         const allcounter = await db.collection('visitors').get();
         res.json({ status: 'success', count: allcounter.docs.length });
+    }
+})
+
+//admin edit mark
+app.post('/api/admin/update/marks', async (req, res) => {
+    const { id,EN,MT,SC,ICT,SN,MY,CN } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ status: 'fail', text: 'Student ID is required' });
+    }
+    const stuRef = await db.collection('students').where('sid', '==', id).get();
+    if (stuRef.empty) {
+        res.status(400).json({ status: 'fail', text: 'No student found with this ID!' });
+    } else {
+        await db.collection('students').doc(stuRef.docs[0].id).update({
+            EN: { mark: EN },
+            MT: { mark: MT },
+            SC: { mark: SC },
+            ICT: { mark: ICT },
+            SN: { mark: SN },
+            MY: { mark: MY },
+            CN: { mark: CN },
+        }).then(async () => {
+            res.json({ status: 'success', text: 'Marks was updated.' });
+        })
     }
 })
 
