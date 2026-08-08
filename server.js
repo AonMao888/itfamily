@@ -2985,6 +2985,49 @@ app.get('/api/get/profile/:uid', async (req, res) => {
         })
     }
 })
+//get student's profile
+app.get('/api/get/teacher/:uid', async (req, res) => {
+    let { uid } = req.params;
+    let got = await db.collection('teachers').where('tid','==',uid).get();
+    if (!got.empty) {
+        let all = got.docs.map((d) => ({
+            id: d.id,
+            ...d.data()
+        }));
+        res.json({
+            status: 'success',
+            text: 'Profile found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No profile was found with this ID.'
+        })
+    }
+})
+//get student's profile via verify
+app.get('/api/check/verify/:sid', async (req, res) => {
+    let { sid } = req.params;
+    let got = await db.collection('students').where('sid','==',sid).get();
+    if (!got.empty) {
+        let all = {
+            date: getdate(got.docs[0].data().time),
+            id: got.docs[0].id,
+            ...got.docs[0].data()
+        }
+        res.json({
+            status: 'success',
+            text: 'Profile found.',
+            data: all
+        })
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'No profile was found with this ID.'
+        })
+    }
+})
 //parent get student's profile
 app.get('/api/parent/access/student/:code', async (req, res) => {
     let { code } = req.params;
