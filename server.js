@@ -3679,6 +3679,130 @@ app.post('/api/admin/update/marks', async (req, res) => {
     }
 })
 
+//get student's august exam result
+app.get('/api/get/exam/august/2026', async (req, res) => {
+    let got = await db.collection('august2026').get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        let d = got.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data()
+        }))
+        res.json({
+            status: 'success',
+            text: 'All student result data are got.',
+            data: d
+        })
+    }
+})
+//add new download key
+app.post('/api/update/exam/august/2026', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('august2026').doc(encrypt(recv.sid)).set({
+                name: recv.name,
+                level: recv.level,
+                address: recv.address,
+                city: recv.city,
+                sid: recv.sid,
+                en: recv.en,
+                mt: recv.mt,
+                ict: recv.ict,
+                sc: recv.sc,
+                my: recv.my,
+                sn: recv.sn,
+                cn: recv.cn,
+                month: "August",
+                year: 2026,
+                adddate: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'New exam result was updated.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while updating exam result!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to update exam result!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//add new august exam publish time
+app.post('/api/publish/exam/august/2026', async (req, res) => {
+    let recv = req.body;
+    if (recv) {
+        try {
+            await db.collection('publishexam').doc('august2026').set({
+                time: recv.time,
+                adddate: admin.firestore.FieldValue.serverTimestamp(),
+            }).then(() => {
+                res.json({
+                    status: 'success',
+                    text: 'Publish exam time was added.',
+                    data: []
+                })
+            }).catch(error => {
+                res.json({
+                    status: 'fail',
+                    text: 'Something went wrong while adding exam publish time!',
+                    data: []
+                })
+            })
+        } catch (e) {
+            res.json({
+                status: 'fail',
+                text: 'Something went wrong to add exam publish time!',
+                data: []
+            })
+        }
+    } else {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    }
+})
+//get august exam publish time
+app.get('/api/get/publish/exam/august/2026', async (req, res) => {
+    let got = await db.collection('publishexam').doc('august2026').get();
+    if (got.empty) {
+        res.json({
+            status: 'fail',
+            text: 'Something went wrong!',
+            data: []
+        })
+    } else {
+        res.json({
+            status: 'success',
+            text: 'August exam publish time data are got.',
+            data: got.data().time
+        })
+    }
+})
+
 app.listen(80, () => {
     console.log('Server was started on port 80.');
 })
